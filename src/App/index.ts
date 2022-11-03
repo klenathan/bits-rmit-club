@@ -7,10 +7,14 @@ import MailRouter from "../Email/mail.routes";
 import AuthPackage from "../Auth";
 import { User } from "../Auth/Models/User.model";
 
+import * as crypto from 'crypto'
+
 
 const PORT = 8080;
 
 const auth = new AuthPackage(db)
+
+
 
 // db.addModels([User])
 

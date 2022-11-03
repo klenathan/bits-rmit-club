@@ -10,15 +10,12 @@ import http, { createServer } from "http";
 import * as socketio from "socket.io";
 import cors from "cors";
 import { isThisTypeNode, textChangeRangeIsUnchanged } from "typescript";
-import * as nodemailer from 'nodemailer';
 
 // Custom Packages
 import * as handlers from "./Middlewares/Errors/handlers";
 import MainRouter from "./Routes";
 import { Sequelize } from "sequelize-typescript";
-// import Auth from "../Auth";
 import Irouter from "../Base/Types/routerInterface";
-// import WS from "../WebSocket";
 
 export default class Server {
   public instance: Application;
@@ -38,10 +35,6 @@ export default class Server {
     this.PORT = PORT;
     this.routerObj = routerObj;
     this.httpServer = createServer(this.instance);
-    // this.webSocket = new WS(this.httpServer)
-    // this.io = this.webSocket.io
-    // this.webSocket.test()
-
     // Construct methods
     this.middleware();
     this.routing();

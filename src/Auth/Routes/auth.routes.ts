@@ -12,5 +12,6 @@ export default class AuthRouter {
     this.routes.post("/login", this.controller.login)
     .post("/signup", this.controller.signUp)
     .get("/getAll",  this.controller.getAllUser) 
+    .put("/:username", this.controller.updateUser)
   }
 }

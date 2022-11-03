@@ -12,13 +12,13 @@ export default class AuthController {
 
   getAllUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        return this.services.getAll().then(result => {
-            return res.status(200).send(result)
-        })
+      return this.services.getAll().then((result) => {
+        return res.status(200).send(result);
+      });
     } catch (e) {
-        return next(e)
+      return next(e);
     }
-  }
+  };
 
   login = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -27,6 +27,8 @@ export default class AuthController {
 
       return await this.services.login(username, password).then((result) => {
         return res.status(200).send(result);
+      }).catch(e => {
+        return next(e)
       });
     } catch (e) {
       return next(e);
@@ -37,11 +39,26 @@ export default class AuthController {
     try {
       let payload: Partial<User> = req.body;
 
-      return this.services.signUp(payload).then((result) => {
+      return await this.services.signUp(payload).then((result) => {
         res.status(200).send(result);
       });
     } catch (e) {
-        return next(e);
+      console.log(e);
+      return next(e);
+    }
+  };
+
+  updateUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const username = req.params.username;
+      let payload = req.body;
+      return this.services.updateUser(username, payload).then((result) => {
+        return res
+          .status(200)
+          .send({message: `Successfully update user data | ${result} users updated`});
+      });
+    } catch (error) {
+      return next(error);
     }
   };
 }
