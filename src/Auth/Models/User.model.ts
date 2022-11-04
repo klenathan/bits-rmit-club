@@ -6,7 +6,10 @@ import {
   DataType,
   PrimaryKey,
   AllowNull,
+  BelongsToMany,
 } from "sequelize-typescript";
+import { Club } from "../../Clubs/Models/Club.model";
+import { ClubUser } from "../../Clubs/Models/ClubUser.model";
 import { Post } from "../../Posts/Models/Post.model";
 
 @Table
@@ -42,6 +45,6 @@ export class User extends Model {
   })
   declare otherAttributes: JSON;
 
-  // @HasMany(() => Post, 'posts')
-  // writtenBooks!: Post[];
+  @BelongsToMany(() => Club, () => ClubUser)
+  member!: Club[];
 }

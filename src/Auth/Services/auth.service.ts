@@ -4,6 +4,7 @@ import CustomError from "../../App/Middlewares/Errors/CustomError";
 import BaseService from "../../Base/base.service";
 import { User } from "../Models/User.model";
 import * as crypto from "crypto";
+import { Club } from "../../Clubs/Models/Club.model";
 
 export default class AuthService extends BaseService<User> {
   declare db: Sequelize;
@@ -13,7 +14,16 @@ export default class AuthService extends BaseService<User> {
   }
 
   getAll = async (): Promise<User[]> => {
-    return await User.findAll().catch((e) => {
+    return await User.findAll({ include: [Club] }).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+  };
+
+  getUserInfo = async (id: string) => {
+    return await User.findByPk(id, {
+      attributes:  {exclude: ['password']},
+      include: Club,
+    }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
   };
@@ -31,12 +41,10 @@ export default class AuthService extends BaseService<User> {
     return await User.findByPk(username).then((result) => {
       let newRes: any;
 
-      
-      
       if (result?.password == password) {
-        newRes = result?.toJSON()
-        delete newRes.password
-        
+        newRes = result?.toJSON();
+        delete newRes.password;
+
         return newRes;
       } else {
         throw new CustomError(

@@ -9,7 +9,8 @@ import {
   AllowNull,
   Default,
   ForeignKey,
-  BelongsToMany
+  BelongsToMany,
+  HasOne
 } from "sequelize-typescript";
 import { User } from "../../Auth/Models/User.model";
 import { ClubUser } from "./ClubUser.model";
@@ -34,3 +35,4 @@ export class Club extends Model {
   member!: User[];
 
 }
+

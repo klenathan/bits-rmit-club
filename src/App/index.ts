@@ -11,12 +11,18 @@ import PostPackage from "../Posts";
 import { User } from "../Auth/Models/User.model";
 import { Post } from "../Posts/Models/Post.model";
 
+// Clubs
+import ClubPackage from "../Clubs";
+import { ClubUser } from "../Clubs/Models/ClubUser.model";
+import { Club } from "../Clubs/Models/Club.model";
+
 const PORT = 8080;
 
-db.addModels([User, Post]);
+db.addModels([User, Post, Club, ClubUser]);
 
 const auth = new AuthPackage(db);
 const post = new PostPackage(db);
+const club = new ClubPackage(db);
 
 const routerObj: Irouter = {
   routers: [
@@ -28,6 +34,7 @@ const routerObj: Irouter = {
     { prefix: "/mail", instance: new MailRouter(db).router },
     { prefix: "/auth", instance: auth.router },
     { prefix: "/post", instance: post.router },
+    { prefix: "/club", instance: club.router },
   ],
 };
 const server = new Server(PORT, db, routerObj);

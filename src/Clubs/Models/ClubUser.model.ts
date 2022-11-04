@@ -20,4 +20,7 @@ export class ClubUser extends Model {
   @Column
   declare cid: string
 
+  @Column
+  declare role: string
+
 }

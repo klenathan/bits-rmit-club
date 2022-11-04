@@ -20,6 +20,16 @@ export default class AuthController {
     }
   };
 
+  getUserInfo = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return await this.services.getUserInfo(req.params.id).then(result => {
+        return res.status(200).send(result)
+      })
+    } catch (error) {
+      return next(error)
+    }
+  }
+
   login = async (req: Request, res: Response, next: NextFunction) => {
     try {
       let username = req.body.username;
