@@ -18,7 +18,10 @@ export default class AuthService extends BaseService<User> {
     });
   };
 
-  login = async (username: string, password: string): Promise<User> => {
+  login = async (
+    username: string,
+    password: string
+  ): Promise<Partial<User>> => {
     const hashPassword = crypto
       .createHash("sha256")
       .update(password)
@@ -26,8 +29,15 @@ export default class AuthService extends BaseService<User> {
     password = hashPassword;
 
     return await User.findByPk(username).then((result) => {
+      let newRes: any;
+
+      
+      
       if (result?.password == password) {
-        return result;
+        newRes = result?.toJSON()
+        delete newRes.password
+        
+        return newRes;
       } else {
         throw new CustomError(
           "WRONG_CREDENTIAL",
@@ -48,8 +58,8 @@ export default class AuthService extends BaseService<User> {
       payload.password = hashPassword;
 
       return await User.create(payload).catch((e) => {
-        if (e.name == 'SequelizeUniqueConstraintError') {
-          throw new CustomError(e.name, 400, 'User already existed');
+        if (e.name == "SequelizeUniqueConstraintError") {
+          throw new CustomError(e.name, 400, "User already existed");
         }
         throw new CustomError(e.name, 400, e.message);
       });

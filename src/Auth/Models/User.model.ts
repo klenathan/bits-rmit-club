@@ -7,6 +7,7 @@ import {
   PrimaryKey,
   AllowNull,
 } from "sequelize-typescript";
+import { Post } from "../../Posts/Models/Post.model";
 
 @Table
 export class User extends Model {
@@ -40,4 +41,7 @@ export class User extends Model {
     type: DataType.JSON,
   })
   declare otherAttributes: JSON;
+
+  // @HasMany(() => Post, 'posts')
+  // writtenBooks!: Post[];
 }

@@ -39,6 +39,9 @@ export default class Server {
     this.middleware();
     this.routing();
     this.errorHandlers();
+
+    // this.instance.use("/", express.static('./Static'))
+    
   }
 
   public start() {
@@ -62,12 +65,19 @@ export default class Server {
     const router = new MainRouter(this.db);
     router.register(this.instance);
 
+    
+
     // External routing for external packages
     for (let route of this.routerObj.routers) {
       if (route.middlewares)
         this.instance.use(route.prefix, route.middlewares, route.instance);
       else this.instance.use(route.prefix, route.instance);
     }
+    this.instance.get("/", (req, res) => {
+      // res.send("hello")
+      res.sendFile(__dirname + "/Static/index.html")
+    })
+    
   }
 
   // Error middlewares (must be after all routers)

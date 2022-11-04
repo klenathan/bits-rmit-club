@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test site</title>
+
+
+</head>
+
+<body>
+    <h1>Test Site</h1>
+    <div>
+
+        <form id="login-form" action="">
+            <input placeholder="Username" type="text" name="username" id="username">
+            <input placeholder="Password" type="text" name="password" id="password">
+            <input type="submit" value="Submit">
+        </form>
+
+        <button onclick="{console.log(Date.now())}">asd</button>
+
+        <div id="post-wrapper">
+
+        </div>
+    </div>
+    <script>
+        const form = document.getElementById('login-form')
+
+        const usernameInput = document.getElementById('username')
+        const passwordInput = document.getElementById('password')
+
+        fetch("/post")
+            .then(response => {
+                return response.json()
+            })
+            .then(result => {
+                for (let post of result) {
+                    console.log(post);
+                    let newPost = document.createElement('div')
+
+                    let author = document.createElement('h3')
+                    author.innerText = post.author
+
+                    let status = document.createElement('p')
+                    status.innerText = post.content ?? "No content"
+
+
+                    let updatedAt = document.createElement('p')
+                    updatedAt.innerText = post.updatedAt
+
+                    let name = document.createElement('p')
+                    name.innerText = `${post.postAuthor.firstName} ${post.postAuthor.lastName}`
+
+                    newPost.appendChild(author)
+                    newPost.appendChild(name)
+                    newPost.appendChild(status)
+                    newPost.appendChild(updatedAt)
+
+                    // newPost.innerText = JSON.stringify(result)
+                    document.getElementById("post-wrapper").appendChild(newPost)
+                }
+
+            })
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            console.log(`${usernameInput.value} | ${passwordInput.value}`);
+            let credential = {
+                username: usernameInput.value,
+                password: passwordInput.value
+            }
+            fetch("/auth/login", {
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                method: "POST",
+                body: JSON.stringify(credential)
+            })
+                .then(response => {
+                    return response.json();
+                })
+                .then(result => {
+                    if (result.name == "WRONG_CREDENTIAL") {
+                        console.log(result.message);
+                    } else if (result.status == 200) {
+                        console.log("Login Success")
+                        console.log(result)
+                    } else {
+                        console.log(result);
+                    }
+                })
+        });
+    </script>
+</body>
+
+</html>
