@@ -12,7 +12,7 @@ import {
   BelongsTo,
   NotNull,
 } from "sequelize-typescript";
-import { User } from "../../Auth/Models/User.model";
+import { Club } from "../../Clubs/Models/Club.model";
 
 @Table
 export class Post extends Model {
@@ -22,12 +22,12 @@ export class Post extends Model {
   declare id: string;
 
   @AllowNull(false)
-  @ForeignKey(() => User)
+  @ForeignKey(() => Club)
   @Column
   declare author: string;
 
-  @BelongsTo(() => User, { foreignKey: "author" })
-  postAuthor!: User;
+  @BelongsTo(() => Club, { foreignKey: "author" })
+  postAuthor!: Club;
 
   @Column
   declare content: string;

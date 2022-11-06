@@ -1,6 +1,9 @@
 import { Router } from "express";
+import multer from "multer";
 import { Sequelize } from "sequelize-typescript";
 import AuthController from "../Controllers/User.controller";
+
+const upload = multer()
 
 export default class AuthRouter {
   declare routes: Router;

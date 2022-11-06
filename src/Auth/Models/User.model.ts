@@ -7,6 +7,7 @@ import {
   PrimaryKey,
   AllowNull,
   BelongsToMany,
+  Default,
 } from "sequelize-typescript";
 import { Club } from "../../Clubs/Models/Club.model";
 import { ClubUser } from "../../Clubs/Models/ClubUser.model";
@@ -27,6 +28,10 @@ export class User extends Model {
 
   @Column
   declare role: string;
+
+  @Default("heh.png")
+  @Column
+  declare avatar: string;
 
   @Column({
     type: DataType.STRING(30),

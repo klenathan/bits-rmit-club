@@ -42,11 +42,12 @@
                     let newPost = document.createElement('div')
 
                     let author = document.createElement('h3')
-                    author.innerText = post.author
+                    author.innerText = post.postAuthor.name
 
                     let status = document.createElement('p')
                     status.innerText = post.content ?? "No content"
-
+                    
+                    // console.log(process.cwd());
 
                     let updatedAt = document.createElement('p')
                     updatedAt.innerText = post.updatedAt
@@ -55,6 +56,7 @@
                     name.innerText = `${post.postAuthor.firstName} ${post.postAuthor.lastName}`
 
                     newPost.appendChild(author)
+                    newPost.appendChild(avatar)
                     newPost.appendChild(name)
                     newPost.appendChild(status)
                     newPost.appendChild(updatedAt)

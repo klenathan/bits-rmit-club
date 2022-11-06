@@ -27,7 +27,7 @@ export default class Server {
   // private webSocket: WS;
   private httpServer: http.Server;
   private routerObj: Irouter;
-  
+
   public constructor(PORT: number, db: Sequelize, routerObj: Irouter) {
     this.instance = express();
     this.db = db;
@@ -39,16 +39,12 @@ export default class Server {
     this.middleware();
     this.routing();
     this.errorHandlers();
-
-    // this.instance.use("/", express.static('./Static'))
-    
   }
 
   public start() {
     this.httpServer.listen(this.PORT, () => {
       console.info("PORT is " + this.PORT);
     });
-    
   }
 
   private middleware() {
@@ -65,8 +61,6 @@ export default class Server {
     const router = new MainRouter(this.db);
     router.register(this.instance);
 
-    
-
     // External routing for external packages
     for (let route of this.routerObj.routers) {
       if (route.middlewares)
@@ -74,10 +68,8 @@ export default class Server {
       else this.instance.use(route.prefix, route.instance);
     }
     this.instance.get("/", (req, res) => {
-      // res.send("hello")
-      res.sendFile(__dirname + "/Static/index.html")
-    })
-    
+      res.sendFile(__dirname + "/Static/index.html");
+    });
   }
 
   // Error middlewares (must be after all routers)

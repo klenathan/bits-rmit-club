@@ -24,6 +24,10 @@ export class Club extends Model {
   @Column
   declare name: string;
 
+  @Default('heh.png')
+  @Column
+  declare avatar: string;
+
   @Column
   declare desc: string;
 

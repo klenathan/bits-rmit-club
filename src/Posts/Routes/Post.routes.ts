@@ -1,6 +1,9 @@
 import { Router } from "express";
+import multer from "multer";
 import { Sequelize } from "sequelize-typescript";
 import PostController from "../Controllers/Post.controller";
+
+const upload = multer()
 
 export default class PostRouter {
   declare routes: Router;
@@ -9,6 +12,6 @@ export default class PostRouter {
     this.routes = Router();
     this.controller = new PostController(db)
     this.routes.get("/", this.controller.getAllPost)
-    .post("/", this.controller.create)
+    .post("/", upload.any(), this.controller.create)
   }
 }

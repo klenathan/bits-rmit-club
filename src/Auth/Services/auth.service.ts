@@ -14,14 +14,17 @@ export default class AuthService extends BaseService<User> {
   }
 
   getAll = async (): Promise<User[]> => {
-    return await User.findAll({ include: [Club] }).catch((e) => {
+    return await User.findAll({
+      attributes: { exclude: ["password"] },
+      include: Club,
+    }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
   };
 
   getUserInfo = async (id: string) => {
     return await User.findByPk(id, {
-      attributes:  {exclude: ['password']},
+      attributes: { exclude: ["password"] },
       include: Club,
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
@@ -38,7 +41,9 @@ export default class AuthService extends BaseService<User> {
       .digest("hex");
     password = hashPassword;
 
-    return await User.findByPk(username).then((result) => {
+    return await User.findByPk(username, {
+      include: Club,
+    }).then((result) => {
       let newRes: any;
 
       if (result?.password == password) {
