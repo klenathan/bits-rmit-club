@@ -21,6 +21,7 @@ export default class PostRouter {
       .post("/", upload.any(), this.controller.create)
       .post("/:pid", this.controller.likePost)
       .post("/comment/:pid", this.controller.createComment)
+      .get("/feed/:uid", this.controller.getFeed)
       .get("/authCheck", async (req, res, next: NextFunction) => {
         try {
             return await this.service.authorizationCheck(

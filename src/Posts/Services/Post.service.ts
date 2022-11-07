@@ -1,5 +1,5 @@
 import { CreatedAt, Sequelize } from "sequelize-typescript";
-import { fn, col } from "sequelize";
+import { fn, col, Op } from "sequelize";
 import { User } from "../../Auth/Models/User.model";
 import CustomError from "../../App/Middlewares/Errors/CustomError";
 import { Post } from "../Models/Post.model";
@@ -28,8 +28,9 @@ export default class PostService {
         `${username} is not authorized to take action on club id ${clubId}`
       );
     }
-    return { Authorized: true };
+    return true;
   };
+  
   // Create post without images
   create = async (payload: Partial<Post>) => {
     if (payload.content == null && payload.imgLink == null) {
@@ -110,16 +111,42 @@ export default class PostService {
   };
 
   getFeedForUser = async (username: string) => {
-    let userClubs = await User.findByPk(username).then((result) => {
-      return result?.$get("member").then((clubs) => {
-        return clubs.map((club) => {
-          return club.clubid;
-        });
+    let userClubs = await User.findByPk(username, { include: Club })
+      .then((result) => {
+        if (!result)
+          throw new CustomError("USER_NOT_FOUND", 404, `${username} not found`);
+        return result.member.map((club) => club.clubid);
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
       });
-    });
-    console.log(userClubs);
 
-    let result = await Post.findAll({ where: { author: [userClubs] } });
+    let result = await Post.findAll({
+      where: { author: userClubs },
+      include: [
+        Club,
+        {
+          model: PostComment,
+          include: [
+            {
+              model: User,
+              attributes: { exclude: ["password"] },
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: { exclude: ["password"] },
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+      order: ["createdAt"],
+    }).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+
     return result;
   };
   // Comments

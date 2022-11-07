@@ -8,25 +8,24 @@
     <title>Test site</title>
 
     <style>
-        .avt{
+        .avt {
             width: 100px;
             height: 100px;
             object-fit: cover;
             border-radius: 50%;
         }
-        .comment-wrapper{
+
+        .comment-wrapper {
             display: flex;
             flex-direction: row;
             background-color: aquamarine;
         }
-
     </style>
 </head>
 
 <body>
     <h1>Test Site</h1>
-    <canvas></canvas>
-    <h2 style="color: red">♥</h2>
+    <h2 id="welcome-txt" style="color: red">♥</h2>
     <div>
 
         <form id="login-form" action="">
@@ -35,7 +34,9 @@
             <input type="submit" value="Submit">
         </form>
 
-        <button onclick="{console.log(Date.now())}">asd</button>
+        <button onclick="{
+            console.log(localStorage.removeItem('user')) 
+        location.reload()}">Sign Out</button>
 
         <div id="post-wrapper">
 
@@ -46,63 +47,74 @@
 
         const usernameInput = document.getElementById('username')
         const passwordInput = document.getElementById('password')
+        const welcomeTxt = document.getElementById('welcome-txt')
 
-        fetch("/post")
-            .then(response => {
-                return response.json()
-            })
-            .then(result => {
-                for (let post of result) {
-                    let newPost = document.createElement('div')
-                    newPost.style.background = "beige"
+        if (localStorage.getItem('user')) {
+            let user = JSON.parse(localStorage.getItem('user'))
+            welcomeTxt.innerText = `Welcome, ${user.username} ♥`
+        } else {
+            welcomeTxt.innerText = `Welcome, guest ♥`
+        }
+        if (localStorage.getItem('user')) {
+            fetch("/post/feed/" + JSON.parse(localStorage.getItem('user')).username)
+                .then(response => {
+                    return response.json()
+                })
+                .then(result => {
+                    for (let post of result) {
+                        let newPost = document.createElement('div')
+                        newPost.style.background = "beige"
 
-                    let author = document.createElement('h3')
-                    author.innerText = post.postAuthor.name
+                        let author = document.createElement('h3')
+                        author.innerText = post.postAuthor.name
 
-                    let avt= document.createElement('img')
-                    avt.className = 'avt'
-                    avt.src = `image/${post.postAuthor.avatar}`
+                        let avt = document.createElement('img')
+                        avt.className = 'avt'
+                        avt.src = `image/${post.postAuthor.avatar}`
 
-                    let status = document.createElement('p')
-                    status.style.fontSize = "1.5rem"
-                    status.innerText = post.content ?? "No content"
+                        let status = document.createElement('p')
+                        status.style.fontSize = "1.5rem"
+                        status.innerText = post.content ?? "No content"
 
-                    let updatedAt = document.createElement('p')
-                    updatedAt.innerText = post.updatedAt
-                    
-                    let img;
-                    
+                        createdAtUnix = Date.parse(post.createdAt);
+                        unitTime = new Date(createdAtUnix)
+                        let createdAt = document.createElement('p')
+                        createdAt.innerText = unitTime.toString()
 
-                    let likeCount = document.createElement('p')
-                    likeCount.innerText = `${post.likes.length} Likes`
+                        let img;
 
-                    let commentsDiv = document.createElement('div')
-                    commentsDiv.className = "comment-wrapper"
-                    for (let commentContent of post.comments){
-                        let comments = document.createElement('p')
-                        comments.innerText = `${commentContent.username}: ${commentContent.comment}`
-                        commentsDiv.appendChild(comments)
+
+                        let likeCount = document.createElement('p')
+                        likeCount.innerText = `${post.likes.length} Likes`
+
+                        let commentsDiv = document.createElement('div')
+                        commentsDiv.className = "comment-wrapper"
+                        for (let commentContent of post.comments) {
+                            let comments = document.createElement('p')
+                            comments.innerText = `${commentContent.username}: ${commentContent.comment}`
+                            commentsDiv.appendChild(comments)
+                        }
+
+                        newPost.appendChild(author)
+                        newPost.appendChild(avt)
+                        newPost.appendChild(createdAt)
+                        // newPost.appendChild(name)
+                        newPost.appendChild(status)
+                        if (post.imgLink) {
+                            img = document.createElement('img')
+                            img.style.maxHeight = "400px"
+                            img.src = `image/${post.imgLink}`
+                            newPost.appendChild(img)
+                        }
+                        newPost.appendChild(likeCount)
+                        newPost.appendChild(commentsDiv)
+
+                        // newPost.innerText = JSON.stringify(result)
+                        document.getElementById("post-wrapper").appendChild(newPost)
                     }
 
-                    newPost.appendChild(author)
-                    newPost.appendChild(avt)
-                    newPost.appendChild(updatedAt)
-                    // newPost.appendChild(name)
-                    newPost.appendChild(status)
-                    if (post.imgLink) {
-                        img= document.createElement('img')
-                        img.style.maxHeight = "400px"
-                        img.src = `image/${post.imgLink}`
-                        newPost.appendChild(img)
-                    }
-                    newPost.appendChild(likeCount)
-                    newPost.appendChild(commentsDiv)
-
-                    // newPost.innerText = JSON.stringify(result)
-                    document.getElementById("post-wrapper").appendChild(newPost)
-                }
-
-            })
+                })
+        }
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -125,15 +137,22 @@
                 .then(result => {
                     if (result.name == "WRONG_CREDENTIAL") {
                         console.log(result.message);
+                        throw new Error("WRONG_CREDENTIAL")
                     } else if (result.status == 200) {
-                        console.log("Login Success")
+                        // console.log("Login Success")
                         console.log(result)
+                        localStorage.setItem("user", JSON.stringify(result));
+                        return result
                     } else {
                         console.log(result);
+                        localStorage.setItem("user", JSON.stringify(result));
+                        location.reload();
+                        return result
                     }
                 })
+
         });
-        
+
     </script>
 </body>
 

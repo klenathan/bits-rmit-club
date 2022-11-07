@@ -53,7 +53,6 @@ export default class AuthController {
         res.status(200).send(result);
       });
     } catch (e) {
-      console.log(e);
       return next(e);
     }
   };

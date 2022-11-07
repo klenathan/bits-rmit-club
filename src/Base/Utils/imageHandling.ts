@@ -16,7 +16,6 @@ export const handleInputImage = async (req: Request, res: Response) => {
       
       let width = Math.round((info.width as number) * scaleIndex);
       let height = Math.round((info.height as number) * scaleIndex);
-    //   console.log(width);
 
       return sharp(files[0].buffer).resize(width, height).toBuffer();
     });

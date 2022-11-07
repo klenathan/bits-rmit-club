@@ -11,6 +11,17 @@ export default class PostController {
     this.service = new PostService(db);
   }
 
+  getFeed = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return await this.service
+        .getFeedForUser(req.params.uid)
+        .then((result) => {
+          return res.send(result);
+        });
+    } catch (e) {
+      return next(e);
+    }
+  };
   getAllPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       return await this.service.getAll().then((result) => {
@@ -24,8 +35,7 @@ export default class PostController {
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       var files = req.files as Express.Multer.File[];
-      // console.log(!files);
-
+      await this.service.authorizationCheck(req.body.user, req.body.author);
       let createResult;
       if (!files) {
         createResult = await this.service.create(req.body);
@@ -56,7 +66,7 @@ export default class PostController {
       const postID = req.params.pid;
       const username = req.body.user;
       const comment = req.body.comment;
-      
+
       return await this.service
         .createComment(postID, username, comment)
         .then((result) => {
