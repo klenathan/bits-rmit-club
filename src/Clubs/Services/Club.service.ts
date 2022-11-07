@@ -61,8 +61,6 @@ export default class ClubService {
       throw new CustomError(e.name, 400, e.message);
     });
 
-    //  users.map(user => user.username)
-
     const club = await Club.findByPk(clubID).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
@@ -74,7 +72,7 @@ export default class ClubService {
         "Some users cannot be found"
       );
     } else if (!club) {
-      throw new CustomError("CLUB_NOT_FOUND", 404, "Invalid club id");
+      throw new CustomError("CLUB_NOT_FOUND", 404, "Invalid club ID");
     } else {
       for (let user of users) {
         club.$add("member", user, {

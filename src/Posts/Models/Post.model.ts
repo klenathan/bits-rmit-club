@@ -11,8 +11,12 @@ import {
   ForeignKey,
   BelongsTo,
   NotNull,
+  BelongsToMany,
 } from "sequelize-typescript";
+import { User } from "../../Auth/Models/User.model";
 import { Club } from "../../Clubs/Models/Club.model";
+import { PostComment } from "./Comment.model";
+import { PostLike } from "./PostLike.model";
 
 @Table
 export class Post extends Model {
@@ -32,9 +36,16 @@ export class Post extends Model {
   @Column
   declare content: string;
 
-  @Column(DataType.ARRAY(DataType.STRING))
-  declare likeList: string[];
+  declare likeCount: number;
 
   @Column
   declare imgLink: string;
+
+  @HasMany(() => PostComment)
+  comments!: PostComment[];
+
+  @BelongsToMany(() => User, () => PostLike)
+  likes!: User[];
+
+  declare createdAt?: string;
 }

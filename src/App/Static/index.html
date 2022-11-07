@@ -7,11 +7,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test site</title>
 
+    <style>
+        .avt{
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        .comment-wrapper{
+            display: flex;
+            flex-direction: row;
+            background-color: aquamarine;
+        }
 
+    </style>
 </head>
 
 <body>
     <h1>Test Site</h1>
+    <canvas></canvas>
+    <h2 style="color: red">♥</h2>
     <div>
 
         <form id="login-form" action="">
@@ -38,28 +53,50 @@
             })
             .then(result => {
                 for (let post of result) {
-                    console.log(post);
                     let newPost = document.createElement('div')
+                    newPost.style.background = "beige"
 
                     let author = document.createElement('h3')
                     author.innerText = post.postAuthor.name
 
+                    let avt= document.createElement('img')
+                    avt.className = 'avt'
+                    avt.src = `image/${post.postAuthor.avatar}`
+
                     let status = document.createElement('p')
+                    status.style.fontSize = "1.5rem"
                     status.innerText = post.content ?? "No content"
-                    
-                    // console.log(process.cwd());
 
                     let updatedAt = document.createElement('p')
                     updatedAt.innerText = post.updatedAt
+                    
+                    let img;
+                    
 
-                    let name = document.createElement('p')
-                    name.innerText = `${post.postAuthor.firstName} ${post.postAuthor.lastName}`
+                    let likeCount = document.createElement('p')
+                    likeCount.innerText = `${post.likes.length} Likes`
+
+                    let commentsDiv = document.createElement('div')
+                    commentsDiv.className = "comment-wrapper"
+                    for (let commentContent of post.comments){
+                        let comments = document.createElement('p')
+                        comments.innerText = `${commentContent.username}: ${commentContent.comment}`
+                        commentsDiv.appendChild(comments)
+                    }
 
                     newPost.appendChild(author)
-                    newPost.appendChild(avatar)
-                    newPost.appendChild(name)
-                    newPost.appendChild(status)
+                    newPost.appendChild(avt)
                     newPost.appendChild(updatedAt)
+                    // newPost.appendChild(name)
+                    newPost.appendChild(status)
+                    if (post.imgLink) {
+                        img= document.createElement('img')
+                        img.style.maxHeight = "400px"
+                        img.src = `image/${post.imgLink}`
+                        newPost.appendChild(img)
+                    }
+                    newPost.appendChild(likeCount)
+                    newPost.appendChild(commentsDiv)
 
                     // newPost.innerText = JSON.stringify(result)
                     document.getElementById("post-wrapper").appendChild(newPost)
@@ -96,6 +133,7 @@
                     }
                 })
         });
+        
     </script>
 </body>
 

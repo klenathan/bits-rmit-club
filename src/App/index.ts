@@ -1,7 +1,5 @@
 import Server from "./server";
 import db from "./Models";
-// import Auth from "../Auth";
-import * as crypto from "crypto";
 
 import Irouter from "../Base/Types/routerInterface";
 import MailRouter from "../Email/mail.routes";
@@ -15,10 +13,13 @@ import { Post } from "../Posts/Models/Post.model";
 import ClubPackage from "../Clubs";
 import { ClubUser } from "../Clubs/Models/ClubUser.model";
 import { Club } from "../Clubs/Models/Club.model";
+import { PostComment } from "../Posts/Models/Comment.model";
+import { PostLike } from "../Posts/Models/PostLike.model";
+import ImgRouter from "../Images/Image.routes";
 
 const PORT = 8080;
 
-db.addModels([User, Post, Club, ClubUser]);
+db.addModels([User, Post, Club, ClubUser, PostLike, PostComment]);
 
 const auth = new AuthPackage(db);
 const post = new PostPackage(db);
@@ -35,6 +36,7 @@ const routerObj: Irouter = {
     { prefix: "/auth", instance: auth.router },
     { prefix: "/post", instance: post.router },
     { prefix: "/club", instance: club.router },
+    { prefix: "/image", instance: new ImgRouter(db).routes },
   ],
 };
 const server = new Server(PORT, db, routerObj);

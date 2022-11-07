@@ -54,7 +54,7 @@ export default class AuthService extends BaseService<User> {
       } else {
         throw new CustomError(
           "WRONG_CREDENTIAL",
-          404,
+          401,
           "Username or password is incorrect"
         );
       }
