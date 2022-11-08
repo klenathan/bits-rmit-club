@@ -28,8 +28,9 @@ export class User extends Model {
   @Column
   declare email: string;
 
-  // @Column
-  // declare role: string;
+  @Default(false)
+  @Column
+  declare isAdmin: boolean;
 
   @Default('validating')
   @Column(DataType.ENUM('validating', 'active', 'banned'))

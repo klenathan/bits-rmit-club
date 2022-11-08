@@ -17,7 +17,7 @@ import { Post } from "../Posts/Models/Post.model";
 import { PostComment } from "../Posts/Models/Comment.model";
 import { PostLike } from "../Posts/Models/PostLike.model";
 
-import ImgRouter from "../Images/Image.routes";
+import ImgRouter from "../ImageProcess/Image.routes";
 
 const PORT = 8080;
 

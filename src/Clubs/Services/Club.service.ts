@@ -10,6 +10,7 @@ export default class ClubService {
   }
 
   create = async (payload: Partial<Club>) => {
+    
     const presidentUser = await User.findByPk(payload.president, {
       attributes: { exclude: ["password"] },
     });
