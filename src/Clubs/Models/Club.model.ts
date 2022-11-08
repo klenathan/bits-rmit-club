@@ -38,5 +38,6 @@ export class Club extends Model {
   @BelongsToMany(() => User, () => ClubUser)
   member!: User[];
 
+
 }
 

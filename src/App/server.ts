@@ -16,6 +16,7 @@ import * as handlers from "./Middlewares/Errors/handlers";
 import MainRouter from "./Routes";
 import { Sequelize } from "sequelize-typescript";
 import Irouter from "../Base/Types/routerInterface";
+import path from "path";
 
 export default class Server {
   public instance: Application;
@@ -67,11 +68,16 @@ export default class Server {
         this.instance.use(route.prefix, route.middlewares, route.instance);
       else this.instance.use(route.prefix, route.instance);
     }
+
     this.instance.get("/", (req, res) => {
       res.sendFile(__dirname + "/Static/index.html");
     });
-    
-    
+
+    this.instance.get("/*", (req, res) => {
+      res
+        .status(200)
+        .sendFile(__dirname + "/Static/404.html");
+    });
   }
 
   // Error middlewares (must be after all routers)

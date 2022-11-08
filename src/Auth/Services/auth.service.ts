@@ -5,6 +5,8 @@ import BaseService from "../../Base/base.service";
 import { User } from "../Models/User.model";
 import * as crypto from "crypto";
 import { Club } from "../../Clubs/Models/Club.model";
+import { UserValidator } from "../Models/Validation.model";
+import MailService from "../../Email/mail.service";
 
 export default class AuthService extends BaseService<User> {
   declare db: Sequelize;
@@ -61,6 +63,40 @@ export default class AuthService extends BaseService<User> {
     });
   };
 
+  validateUser = async (username: string, key: string) => {
+    return await UserValidator.findOne({where: {username: username}})
+      .then((result) => {
+        if (result?.key == 'null') {
+          throw new CustomError(
+            "USER_VERIFIED",
+            400,
+            `User ${username} has already been verified`
+          );
+        } else if (result?.key != key)
+          throw new CustomError(
+            "WRONG_VERIFICATION_KEY",
+            400,
+            "Wrong verification key"
+          );
+        // result.$set('key', null)
+        result.update({key: 'null'} )
+        return true;
+      })
+      .then((r) => {
+        
+        User.update(
+          { status: "active" },
+          { where: { username: username } }
+        ).catch((e) => {
+          throw new CustomError(e.name, 400, e.message);
+        });
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+  };
+
   signUp = async (payload: Partial<User>): Promise<User> => {
     if (payload.password) {
       let password: string = payload.password;
@@ -69,6 +105,25 @@ export default class AuthService extends BaseService<User> {
         .update(password)
         .digest("hex");
       payload.password = hashPassword;
+
+      let randomToken = (Math.random() + 1)
+        .toString(36)
+        .substring(2, 8)
+        .toUpperCase();
+
+      await UserValidator.create({
+        username: payload.username,
+        key: randomToken,
+      })
+        .then((result) => {
+          if (!payload.email) {
+            throw new CustomError("INVALID_EMAIL", 400, "Invalid input email");
+          }
+          new MailService().sendVerificationMail(payload.email, randomToken);
+        })
+        .catch((e) => {
+          throw new CustomError(e.name, 400, e.message);
+        });
 
       return await User.create(payload).catch((e) => {
         if (e.name == "SequelizeUniqueConstraintError") {

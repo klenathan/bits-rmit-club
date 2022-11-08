@@ -116,6 +116,14 @@
                 })
         }
 
+        fetch("http://localhost:8080/auth")
+        .then(response => {
+            return response.json()
+        })
+        .then(result => {
+            console.log(result);
+        })
+
         form.addEventListener('submit', function (e) {
             e.preventDefault();
             console.log(`${usernameInput.value} | ${passwordInput.value}`);

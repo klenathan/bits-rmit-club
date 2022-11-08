@@ -26,7 +26,14 @@ export class User extends Model {
   declare firstName: string;
 
   @Column
-  declare role: string;
+  declare email: string;
+
+  // @Column
+  // declare role: string;
+
+  @Default('validating')
+  @Column(DataType.ENUM('validating', 'active', 'banned'))
+  declare status: string;
 
   @Default("heh.png")
   @Column

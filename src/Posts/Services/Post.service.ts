@@ -42,6 +42,8 @@ export default class PostService {
     return await Post.create(payload, {
       include: Club,
     }).catch((e) => {
+      console.log(e);
+      
       throw new CustomError(e.name, 400, e.message);
     });
   };
