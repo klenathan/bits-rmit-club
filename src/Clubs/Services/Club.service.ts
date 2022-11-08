@@ -45,6 +45,14 @@ export default class ClubService {
     });
   };
 
+  editClubInfo = async (clubId: string, payload: Partial<Club>) => {
+    return await Club.update(payload, {
+      where: { clubid: clubId },
+    }).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+  };
+
   addClubMember = async (
     clubID: string,
     userArr: { username: string; role: string }[]

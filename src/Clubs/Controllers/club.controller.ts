@@ -21,6 +21,19 @@ export default class ClubController {
     }
   };
 
+  editClubInfo = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let clubId = req.params.id;
+      return await this.service
+        .editClubInfo(clubId, req.body)
+        .then((result) => {
+          return res.send({ message: ` Edited ${result} clubs info` });
+        });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
   addNewMember = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const clubID = req.body.clubId;

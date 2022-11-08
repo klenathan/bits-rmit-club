@@ -19,10 +19,17 @@ import { PostLike } from "../Posts/Models/PostLike.model";
 
 import ImgRouter from "../Images/Image.routes";
 
-
 const PORT = 8080;
 
-db.addModels([User, Post, Club, ClubUser, PostLike, PostComment, UserValidator]);
+db.addModels([
+  User,
+  Post,
+  Club,
+  ClubUser,
+  PostLike,
+  PostComment,
+  UserValidator,
+]);
 
 const auth = new AuthPackage(db);
 const post = new PostPackage(db);
