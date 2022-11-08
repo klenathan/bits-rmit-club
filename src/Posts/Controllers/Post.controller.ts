@@ -27,7 +27,7 @@ export default class PostController {
       return await this.service.getAll().then((result) => {
         return res.status(200).send(result);
       });
-    } catch (e) {
+     } catch (e) {
       return next(e);
     }
   };
@@ -55,6 +55,20 @@ export default class PostController {
       let uID = req.body.user;
       return await this.service.likePost(pID, uID).then((result) => {
         return res.send(result);
+      });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  removeLikePost = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let pID = req.params.pid;
+      let uID = req.body.user;
+      return await this.service.removeLikePost(pID, uID).then((result) => {
+        console.log(result);
+        
+        return res.status(200).send({message: `Removed ${uID}'s like on post ${pID}`});
       });
     } catch (e) {
       return next(e);

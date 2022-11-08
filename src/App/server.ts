@@ -70,6 +70,8 @@ export default class Server {
     this.instance.get("/", (req, res) => {
       res.sendFile(__dirname + "/Static/index.html");
     });
+    
+    
   }
 
   // Error middlewares (must be after all routers)

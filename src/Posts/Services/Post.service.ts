@@ -30,8 +30,7 @@ export default class PostService {
     }
     return true;
   };
-  
-  // Create post without images
+
   create = async (payload: Partial<Post>) => {
     if (payload.content == null && payload.imgLink == null) {
       throw new CustomError(
@@ -106,6 +105,30 @@ export default class PostService {
     }
 
     return await post.$add("likes", userID).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+  };
+
+  removeLikePost = async (postID: string, userID: string) => {
+    let post = await Post.findByPk(postID).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+
+    if (!post)
+      throw new CustomError("POST_NOT_FOUND", 404, `${postID} not found`);
+
+    let likes = await PostLike.findAndCountAll({
+      where: { uID: userID, pID: postID },
+    });
+    if (likes.count == 0) {
+      throw new CustomError(
+        "USER_NOT_LIKED",
+        400,
+        `${userID} does not liked post ${postID}`
+      );
+    }
+
+    return await post.$remove("likes", userID).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
   };

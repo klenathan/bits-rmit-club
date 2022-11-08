@@ -19,20 +19,21 @@ export default class PostRouter {
     this.routes
       .get("/", this.controller.getAllPost)
       .post("/", upload.any(), this.controller.create)
-      .post("/:pid", this.controller.likePost)
+      .post("/like/:pid", this.controller.likePost)
       .post("/comment/:pid", this.controller.createComment)
+      .delete("/removelike/:pid", this.controller.removeLikePost)
       .get("/feed/:uid", this.controller.getFeed)
-      .get("/authCheck", async (req, res, next: NextFunction) => {
-        try {
-            return await this.service.authorizationCheck(
-                req.body.username,
-                req.body.club
-              ).then(result => {
-                  return res.send(result)
-              })
-        } catch (error) {
-            return next(error)
-        }
-      });
+      // .get("/authCheck", async (req, res, next: NextFunction) => {
+      //   try {
+      //       return await this.service.authorizationCheck(
+      //           req.body.username,
+      //           req.body.club
+      //         ).then(result => {
+      //             return res.send(result)
+      //         })
+      //   } catch (error) {
+      //       return next(error)
+      //   }
+      // });
   }
 }
