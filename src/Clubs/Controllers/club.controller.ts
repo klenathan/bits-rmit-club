@@ -27,12 +27,25 @@ export default class ClubController {
       return await this.service
         .editClubInfo(clubId, req.body)
         .then((result) => {
-          return res.send({ message: ` Edited ${result} clubs info` });
+          return res.send({ message: ` Edited ${result} clubs info: ${clubId}` });
         });
     } catch (e) {
       return next(e);
     }
   };
+
+  promoteToPresident = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let newPresident = req.body.newPresident
+      let clubId = req.params.id
+      let user = req.body.user
+      return await this.service.promoteToPresident(user, newPresident, clubId).then(result => {
+        return res.send(result)
+      })
+    } catch (e) {
+      return next(e)
+    }
+  }
 
   addNewMember = async (req: Request, res: Response, next: NextFunction) => {
     try {

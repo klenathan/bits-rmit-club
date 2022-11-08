@@ -56,7 +56,7 @@ export default class Server {
     this.instance.use(express.json());
     this.instance.use(express.urlencoded({ extended: true }));
   }
-
+ 
   // Routers
   private routing() {
     const router = new MainRouter(this.db);

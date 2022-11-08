@@ -2,6 +2,8 @@ import { Sequelize } from "sequelize-typescript";
 import { User } from "../../Auth/Models/User.model";
 import CustomError from "../../App/Middlewares/Errors/CustomError";
 import { Club } from "../Models/Club.model";
+import { ClubUser } from "../Models/ClubUser.model";
+import NotFoundError from "../../App/Middlewares/Errors/NotFoundError";
 
 export default class ClubService {
   declare db: Sequelize;
@@ -10,7 +12,6 @@ export default class ClubService {
   }
 
   create = async (payload: Partial<Club>) => {
-    
     const presidentUser = await User.findByPk(payload.president, {
       attributes: { exclude: ["password"] },
     });
@@ -22,7 +23,7 @@ export default class ClubService {
 
       await newClub.$add("member", presidentUser, {
         through: {
-          role: "admin",
+          role: "president",
         },
       });
       return newClub;
@@ -39,7 +40,7 @@ export default class ClubService {
     return await Club.findByPk(clubID, {
       include: {
         model: User,
-        attributes: ["username", "firstName", "lastName", "role"],
+        attributes: ["username", "firstName", "lastName"],
       },
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
@@ -103,5 +104,77 @@ export default class ClubService {
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
+  };
+
+  promoteToPresident = async (
+    requester: string,
+    username: string,
+    clubId: string
+  ) => {
+    let currentPresident = await ClubUser.findOne({
+      where: { role: "president", cid: clubId },
+    })
+      .then(async (result) => {
+        // Check if user is Club's president
+        if (!(result?.username == requester)) {
+          // Check if user is APP Admin
+          await User.findByPk(requester).then((requesterInfo) => {
+            if (!requesterInfo?.isAdmin) {
+              throw new CustomError(
+                "UNAUTHORIZED",
+                403,
+                "You do not have permission for this action"
+              );
+            }
+          });
+        } else if (result?.username == username) {
+          throw new CustomError(
+            "USER_IS_PRESIDENT",
+            400,
+            `${username} is already the president`
+          );
+        } else {
+          await result?.update({ role: "member" });
+        }
+        return result;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    await ClubUser.findAndCountAll({
+      where: { username: username, role: "president" },
+    }).then((result) => {
+      if (result.count > 1)
+        throw new CustomError(
+          "USER_ALREADY_PRESIDENT",
+          400,
+          `${username} is currently a president of a different club`
+        );
+    });
+
+    // Get current candidate information
+    let clubUser = await ClubUser.findOne({
+      where: { username: username, cid: clubId },
+      attributes: { exclude: ["createdAt"] },
+    }).then((result) => {
+      if (!result)
+        throw new NotFoundError("USER_NOT_FOUND", `${username} is not found`);
+      if (result.role == "president")
+        throw new CustomError(
+          "USER_IS_PRESIDENT",
+          400,
+          `${username} is already the president`
+        );
+      else {
+        result.update({ role: "president" });
+        return result;
+      }
+    });
+    let curr = currentPresident?.username ?? "none";
+    return {
+      message: `${clubUser.username} has been promoted to president, replacing ${curr}`,
+      newPresident: clubUser,
+    };
   };
 }

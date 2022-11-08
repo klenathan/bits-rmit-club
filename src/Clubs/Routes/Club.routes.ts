@@ -14,5 +14,6 @@ export default class ClubRouter {
     .post("/", this.controller.create)
     .post("/member", this.controller.addNewMember)
     .put("/edit/:id", this.controller.editClubInfo)
+    .put("/promote/:id", this.controller.promoteToPresident)
   }
 }
