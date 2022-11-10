@@ -21,12 +21,27 @@
             background-color: aquamarine;
         }
     </style>
+
+
 </head>
 
 <body>
     <h1>Test Site</h1>
     <h2 id="welcome-txt" style="color: red">♥</h2>
     <div>
+        <form action="" id="ws-form">
+            <input type="text" name="" autofocus id="input">
+            <input type="submit" value="submit">
+        </form>
+        <div id="chat-wrapper">
+
+        </div>
+    </div>
+
+    <div>
+        <div><b>Online List:</b>
+            <p id="online-list"></p>
+        </div>
 
         <form id="login-form" action="">
             <input placeholder="Username" type="text" name="username" id="username">
@@ -42,6 +57,9 @@
 
         </div>
     </div>
+
+
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         const form = document.getElementById('login-form')
 
@@ -117,12 +135,12 @@
         }
 
         fetch("http://localhost:8080/auth")
-        .then(response => {
-            return response.json()
-        })
-        .then(result => {
-            console.log(result);
-        })
+            .then(response => {
+                return response.json()
+            })
+            .then(result => {
+                console.log(result);
+            })
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -161,6 +179,57 @@
 
         });
 
+    </script>
+    <script>
+        // document.onload = function () {
+            // document.getElementById("input").autofocus
+        
+
+        let currUsername = JSON.parse(localStorage.getItem('user')).username
+        console.log(currUsername);
+        var socket = io(window.location.origin, { query: `loggeduser=${currUsername}` });
+
+        var form2 = document.getElementById('ws-form');
+        var input = document.getElementById('input');
+
+        form2.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (input.value) {
+                socket.emit('chat message', { username: "test user", msg: input.value });
+                input.value = '';
+            }
+            // document.getElementById("input").focus();
+        });
+        let chatWrapper = document.getElementById('chat-wrapper')
+
+        let myId;
+
+        socket.on("updateOnlineList", (online) => {
+            console.log(online);
+            document.getElementById('online-list').innerText = online
+        })
+
+        socket.on('connectionChange', (msg) => {
+            let newMess = document.createElement('p')
+            newMess.style.background = 'yellow'
+            newMess.innerText = msg
+            chatWrapper.appendChild(newMess)
+        })
+
+        socket.on("server", (msg) => {
+            let newMess = document.createElement('p')
+            if (msg.username != currUsername) newMess.style.background = 'green'
+            else newMess.style.background = 'beige'
+            newMess.innerText = msg.username + ": " + msg.msg
+            console.log(msg);
+            chatWrapper.appendChild(newMess)
+        })
+        socket.on('disconnected', function () {
+            socket.emit('disconnect', person_name);
+        });
+        socket.on("notification", (msg) => {
+            console.log(msg);
+        })
     </script>
 </body>
 

@@ -5,6 +5,8 @@ import { Club } from "../Models/Club.model";
 import { ClubUser } from "../Models/ClubUser.model";
 import NotFoundError from "../../App/Middlewares/Errors/NotFoundError";
 
+
+
 export default class ClubService {
   declare db: Sequelize;
   constructor(db: Sequelize) {

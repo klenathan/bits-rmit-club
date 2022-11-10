@@ -17,6 +17,7 @@ import MainRouter from "./Routes";
 import { Sequelize } from "sequelize-typescript";
 import Irouter from "../Base/Types/routerInterface";
 import path from "path";
+import WS from "../WebSocket";
 
 export default class Server {
   public instance: Application;
@@ -25,7 +26,7 @@ export default class Server {
   declare db: Sequelize;
   public options: any;
   // private io: socketio.Server;
-  // private webSocket: WS;
+  private webSocket: WS;
   private httpServer: http.Server;
   private routerObj: Irouter;
 
@@ -36,10 +37,15 @@ export default class Server {
     this.PORT = PORT;
     this.routerObj = routerObj;
     this.httpServer = createServer(this.instance);
+    this.webSocket = new WS(this.httpServer)
+
+
     // Construct methods
     this.middleware();
+    this.webSocket.test();
     this.routing();
     this.errorHandlers();
+
   }
 
   public start() {
