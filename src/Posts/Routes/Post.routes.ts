@@ -23,6 +23,7 @@ export default class PostRouter {
       .post("/comment/:pid", this.controller.createComment)
       .delete("/removelike/:pid", this.controller.removeLikePost)
       .get("/feed/:uid", this.controller.getFeed)
+      .get("/clubfeed/:id", this.controller.getClubFeed)
       // .get("/authCheck", async (req, res, next: NextFunction) => {
       //   try {
       //       return await this.service.authorizationCheck(

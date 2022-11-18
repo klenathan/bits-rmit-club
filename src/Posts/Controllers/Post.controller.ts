@@ -11,6 +11,16 @@ export default class PostController {
     this.service = new PostService(db);
   }
 
+  getClubFeed = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return await this.service.getClubFeed(req.params.id).then(result => {
+        return res.status(200).send(result)
+      })
+    } catch (e) {
+      return next(e)
+    }
+  }
+
   getFeed = async (req: Request, res: Response, next: NextFunction) => {
     try {
       return await this.service

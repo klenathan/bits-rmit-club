@@ -43,7 +43,7 @@ export default class PostService {
       include: Club,
     }).catch((e) => {
       console.log(e);
-      
+
       throw new CustomError(e.name, 400, e.message);
     });
   };
@@ -53,7 +53,7 @@ export default class PostService {
     files: Express.Multer.File[]
   ) => {
     try {
-      payload.imgLink = []
+      payload.imgLink = [];
       for (let file of files) {
         let fileName = file.originalname;
         const newFileName = `postIMG-${Date.now()}-${fileName}`;
@@ -63,11 +63,11 @@ export default class PostService {
           .catch((e) => {
             throw new CustomError(e.name, 400, e.message);
           });
-        payload.imgLink.push(newFileName)
+        payload.imgLink.push(newFileName);
       }
-      
+
       console.log(payload.imgLink == null);
-      
+
       if (payload.content == null && payload.imgLink.length == 0) {
         throw new CustomError(
           "INVALID_POST",
@@ -176,8 +176,35 @@ export default class PostService {
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
-
     return result;
+  };
+
+  getClubFeed = async (id: string) => {
+    return await Post.findAll({
+      where: { author: id },
+      include: [
+        Club,
+        {
+          model: PostComment,
+          include: [
+            {
+              model: User,
+              attributes: { exclude: ["password"] },
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: { exclude: ["password"] },
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+      order: ["createdAt"],
+    }).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
   };
   // Comments
   createComment = async (postID: string, username: string, comment: string) => {
@@ -200,7 +227,6 @@ export default class PostService {
     ).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
-
     return newComment;
   };
 
