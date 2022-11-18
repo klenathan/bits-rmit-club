@@ -38,8 +38,8 @@ export class Post extends Model {
 
   declare likeCount: number;
 
-  @Column
-  declare imgLink: string;
+  @Column({ type: DataType.ARRAY(DataType.STRING) })
+  declare imgLink: string[];
 
   @HasMany(() => PostComment)
   comments!: PostComment[];

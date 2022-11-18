@@ -5,8 +5,6 @@ import { Club } from "../Models/Club.model";
 import { ClubUser } from "../Models/ClubUser.model";
 import NotFoundError from "../../App/Middlewares/Errors/NotFoundError";
 
-
-
 export default class ClubService {
   declare db: Sequelize;
   constructor(db: Sequelize) {
@@ -44,9 +42,15 @@ export default class ClubService {
         model: User,
         attributes: ["username", "firstName", "lastName"],
       },
-    }).catch((e) => {
-      throw new CustomError(e.name, 400, e.message);
-    });
+    })
+      .then((res) => {
+        if (res == null)
+          throw new NotFoundError("NOT_FOUND", `${clubID} cannot be found`);
+        return res;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
   };
 
   editClubInfo = async (clubId: string, payload: Partial<Club>) => {

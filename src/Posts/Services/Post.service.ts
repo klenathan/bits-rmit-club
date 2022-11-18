@@ -21,7 +21,7 @@ export default class PostService {
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
-    if (club[0].role != "admin") {
+    if (club[0].role != "np") {
       throw new CustomError(
         "UNAUTHORIZED",
         403,
@@ -53,17 +53,22 @@ export default class PostService {
     files: Express.Multer.File[]
   ) => {
     try {
-      let fileName = files[0].originalname;
-      const newFileName = `postIMG-${Date.now()}-${fileName}`;
-      // Write file to database (")> if we have one
-      await sharp(files[0].buffer)
-        .toFile(`Images/${newFileName}`)
-        .catch((e) => {
-          throw new CustomError(e.name, 400, e.message);
-        });
-      payload.imgLink = newFileName;
-
-      if (payload.content == null && payload.imgLink == null) {
+      payload.imgLink = []
+      for (let file of files) {
+        let fileName = file.originalname;
+        const newFileName = `postIMG-${Date.now()}-${fileName}`;
+        // Write file to database (")> if we have one
+        await sharp(file.buffer)
+          .toFile(`Images/${newFileName}`)
+          .catch((e) => {
+            throw new CustomError(e.name, 400, e.message);
+          });
+        payload.imgLink.push(newFileName)
+      }
+      
+      console.log(payload.imgLink == null);
+      
+      if (payload.content == null && payload.imgLink.length == 0) {
         throw new CustomError(
           "INVALID_POST",
           400,
