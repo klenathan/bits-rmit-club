@@ -21,7 +21,7 @@ export default class PostService {
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
-    if (club[0].role != "np") {
+    if (club[0].role != "president") {
       throw new CustomError(
         "UNAUTHORIZED",
         403,
