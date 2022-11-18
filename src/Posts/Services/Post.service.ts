@@ -172,7 +172,7 @@ export default class PostService {
           },
         },
       ],
-      order: ["createdAt", 'DESC'],
+      order: [["createdAt", 'DESC'],]
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
@@ -201,7 +201,7 @@ export default class PostService {
           },
         },
       ],
-      order: ["createdAt", 'DESC'],
+      order: [["createdAt", 'DESC']],
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
@@ -251,7 +251,7 @@ export default class PostService {
           },
         },
       ],
-      order: ["createdAt", 'DESC'],
+      order: [["createdAt", 'DESC']],
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
