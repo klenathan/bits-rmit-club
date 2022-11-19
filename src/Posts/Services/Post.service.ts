@@ -172,7 +172,7 @@ export default class PostService {
           },
         },
       ],
-      order: [["createdAt", 'DESC'],]
+      order: [["createdAt", "DESC"]],
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
@@ -201,11 +201,38 @@ export default class PostService {
           },
         },
       ],
-      order: [["createdAt", 'DESC']],
+      order: [["createdAt", "DESC"]],
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
   };
+
+  getByPk = async (id: string) => {
+    return await Post.findByPk(id, {
+      include: [
+        Club,
+        {
+          model: PostComment,
+          include: [
+            {
+              model: User,
+              attributes: { exclude: ["password"] },
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: { exclude: ["password"] },
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+    }).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+  };
+
   // Comments
   createComment = async (postID: string, username: string, comment: string) => {
     let postResult = await Post.findByPk(postID)
@@ -251,7 +278,7 @@ export default class PostService {
           },
         },
       ],
-      order: [["createdAt", 'DESC']],
+      order: [["createdAt", "DESC"]],
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });

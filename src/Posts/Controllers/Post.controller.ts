@@ -42,6 +42,17 @@ export default class PostController {
     }
   };
 
+  getByPk = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let id = req.params.id
+      return await this.service.getByPk(id).then((result) => {
+        return res.status(200).send(result);
+      });
+     } catch (e) {
+      return next(e);
+    }
+  };
+
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       var files = req.files as Express.Multer.File[];
