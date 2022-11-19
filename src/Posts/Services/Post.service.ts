@@ -228,9 +228,16 @@ export default class PostService {
           },
         },
       ],
-    }).catch((e) => {
-      throw new CustomError(e.name, 400, e.message);
-    });
+    })
+      .then((result) => {
+        if (result == null) {
+          throw new CustomError("NOT_FOUND", 404, `Post ${id} not found`);
+        }
+        return result;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
   };
 
   // Comments
