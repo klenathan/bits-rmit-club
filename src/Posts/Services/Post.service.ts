@@ -223,7 +223,7 @@ export default class PostService {
         postID: postID,
         username: username,
       },
-      { include: [Post] }
+      { include: [Post, User] }
     ).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
