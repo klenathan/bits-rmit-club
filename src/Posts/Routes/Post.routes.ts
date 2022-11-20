@@ -25,17 +25,6 @@ export default class PostRouter {
       .get("/feed/:uid", this.controller.getFeed)
       .get("/clubfeed/:id", this.controller.getClubFeed)
       .get("/:id", this.controller.getByPk)
-      // .get("/authCheck", async (req, res, next: NextFunction) => {
-      //   try {
-      //       return await this.service.authorizationCheck(
-      //           req.body.username,
-      //           req.body.club
-      //         ).then(result => {
-      //             return res.send(result)
-      //         })
-      //   } catch (error) {
-      //       return next(error)
-      //   }
-      // });
+      .delete("/:id", this.controller.deletePost);
   }
 }

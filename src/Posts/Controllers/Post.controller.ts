@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Sequelize } from "sequelize-typescript";
 import sharp from "sharp";
+import CustomError from "../../App/Middlewares/Errors/CustomError";
 import PostService from "../Services/Post.service";
 
 export default class PostController {
@@ -13,13 +14,13 @@ export default class PostController {
 
   getClubFeed = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      return await this.service.getClubFeed(req.params.id).then(result => {
-        return res.status(200).send(result)
-      })
+      return await this.service.getClubFeed(req.params.id).then((result) => {
+        return res.status(200).send(result);
+      });
     } catch (e) {
-      return next(e)
+      return next(e);
     }
-  }
+  };
 
   getFeed = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -37,18 +38,18 @@ export default class PostController {
       return await this.service.getAll().then((result) => {
         return res.status(200).send(result);
       });
-     } catch (e) {
+    } catch (e) {
       return next(e);
     }
   };
 
   getByPk = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      let id = req.params.id
+      let id = req.params.id;
       return await this.service.getByPk(id).then((result) => {
         return res.status(200).send(result);
       });
-     } catch (e) {
+    } catch (e) {
       return next(e);
     }
   };
@@ -59,7 +60,7 @@ export default class PostController {
       await this.service.authorizationCheck(req.body.user, req.body.author);
       let createResult;
       console.log(req.body);
-      
+
       if (!files) {
         createResult = await this.service.create(req.body);
       } else {
@@ -90,8 +91,10 @@ export default class PostController {
       let uID = req.body.user;
       return await this.service.removeLikePost(pID, uID).then((result) => {
         console.log(result);
-        
-        return res.status(200).send({message: `Removed ${uID}'s like on post ${pID}`});
+
+        return res
+          .status(200)
+          .send({ message: `Removed ${uID}'s like on post ${pID}` });
       });
     } catch (e) {
       return next(e);
@@ -108,6 +111,21 @@ export default class PostController {
         .createComment(postID, username, comment)
         .then((result) => {
           res.send(result);
+        });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  deletePost = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      if (!req.body.user) {
+        return next(new CustomError("INVALID_INFO", 400, "Invalid username"))
+      }
+      return await this.service
+        .deletePost(req.body.user, req.params.id)
+        .then((result) => {
+          return res.status(200).send(result);
         });
     } catch (e) {
       return next(e);

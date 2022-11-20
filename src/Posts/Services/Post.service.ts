@@ -8,6 +8,7 @@ import sharp from "sharp";
 import { PostLike } from "../Models/PostLike.model";
 import { PostComment } from "../Models/Comment.model";
 import { ClubUser } from "../../Clubs/Models/ClubUser.model";
+import NotFoundError from "../../App/Middlewares/Errors/NotFoundError";
 
 export default class PostService {
   declare db: Sequelize;
@@ -21,6 +22,14 @@ export default class PostService {
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
+    if (club.length == 0)
+      throw new CustomError(
+        "UNAUTHORIZED",
+        403,
+        `${username} is not authorized to take action on club id ${clubId}`
+      );
+    // console.log(club);
+
     if (club[0].role != "president") {
       throw new CustomError(
         "UNAUTHORIZED",
@@ -289,5 +298,46 @@ export default class PostService {
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
+  };
+
+  deletePost = async (user: string, postID: string) => {
+    let post = await Post.findByPk(postID, {
+      include: [
+        Club,
+        {
+          model: PostComment,
+          include: [
+            {
+              model: User,
+              attributes: { exclude: ["password"] },
+            },
+          ],
+        },
+        {
+          model: User,
+          attributes: { exclude: ["password"] },
+          through: {
+            attributes: [],
+          },
+        },
+      ],
+    }).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+
+    if (!post)
+      throw new NotFoundError("NOT_FOUND", `Post ${postID} cannot be found`);
+    let id = post.id;
+    if (await this.authorizationCheck(user, post.author)) {
+      return await post
+        .destroy()
+        .then((r) => {
+          return { message: `deleted post ${id}` };
+        })
+        .catch((e) => {
+          throw new CustomError(e.name, 400, e.message);
+        });
+    }
+    return { message: "UNKNOWN_ERR" };
   };
 }
