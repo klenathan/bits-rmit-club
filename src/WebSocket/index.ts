@@ -32,60 +32,63 @@ export default class WS {
 
       if (!username) {
         throw new Error("no username found");
+        console.log("no username found");
       } else if (typeof username != "string") {
         throw new Error("username not string");
-      }
-
-      if (!(username in this.currentLobby)) {
-        this.currentLobby[username] = {};
-      }
-      // console.log(this.currentLobby[username]["sockets"]);
-
-      if (!this.currentLobby[username]["sockets"]) {
-        this.currentLobby[username]["sockets"] = [];
-        this.currentLobby[username]["sockets"].push(socket.id);
+        console.log("username not string");
       } else {
-        this.currentLobby[username]["sockets"].push(socket.id);
-      }
-
-      /// EVENTS
-      this.io.emit("updateOnlineList", Object.keys(this.currentLobby));
-
-      this.io.emit(
-        "connectionChange",
-        `${username} has connected, ${JSON.stringify(this.currentLobby)}`
-      );
-
-      console.log(
-        `${socket.id} connected with name ${username} | ${this.io.engine.clientsCount} | `
-      );
-
-      socket.on("chat message", (msg) => {
-        // this.notification("admin");
-        console.log(msg);
-
-        let sendData = { username: username, msg: msg.msg };
-        socket.emit("server", sendData);
-        socket.broadcast.emit("server", sendData);
-      });
-
-      socket.on("disconnect", (msg) => {
-        if (!username) {
-          throw new Error("no username found");
-        } else if (typeof username != "string") {
-          throw new Error("username not string");
+        if (!(username in this.currentLobby)) {
+          this.currentLobby[username] = {};
         }
-        const index = this.currentLobby[username]["sockets"].indexOf(
-          socket.id,
-          0
-        );
-        this.currentLobby[username]["sockets"].pop(index);
-        if (this.currentLobby[username]["sockets"].length == 0) {
-          delete this.currentLobby[username];
+        // console.log(this.currentLobby[username]["sockets"]);
+
+        if (!this.currentLobby[username]["sockets"]) {
+          this.currentLobby[username]["sockets"] = [];
+          this.currentLobby[username]["sockets"].push(socket.id);
+        } else {
+          this.currentLobby[username]["sockets"].push(socket.id);
         }
-        this.io.emit("connectionChange", `${username} has disconnected`);
+
+        /// EVENTS
         this.io.emit("updateOnlineList", Object.keys(this.currentLobby));
-      });
+
+        this.io.emit(
+          "connectionChange",
+          `${username} has connected, ${JSON.stringify(this.currentLobby)}`
+        );
+
+        console.log(
+          `${socket.id} connected with name ${username} | ${this.io.engine.clientsCount} | `
+        );
+
+        socket.on("chat message", (msg) => {
+          // this.notification("admin");
+          console.log(msg);
+
+          let sendData = { username: username, msg: msg.msg };
+          socket.emit("server", sendData);
+          socket.broadcast.emit("server", sendData);
+        });
+
+        socket.on("disconnect", (msg) => {
+          if (!username) {
+            throw new Error("no username found");
+          } else if (typeof username != "string") {
+            throw new Error("username not string");
+          }
+          const index = this.currentLobby[username]["sockets"].indexOf(
+            socket.id,
+            0
+          );
+          this.currentLobby[username]["sockets"].pop(index);
+          if (this.currentLobby[username]["sockets"].length == 0) {
+            delete this.currentLobby[username];
+          }
+          this.io.emit("connectionChange", `${username} has disconnected`);
+          this.io.emit("updateOnlineList", Object.keys(this.currentLobby));
+        });
+      }
+      // username = 'test'
     });
   }
 
