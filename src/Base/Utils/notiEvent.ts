@@ -3,20 +3,16 @@ import axios from "axios";
 export const NewNotiUtil = async (
   username: string | string[],
   content: string,
+  type?: string,
   img?: string
 ) => {
   let payload: any = {};
 
-  if (img) {
-    payload = {
-      content: content,
-      image: img,
-    };
-  } else {
-    payload = {
-      content: content,
-    };
-  }
+  payload = {
+    content: content,
+    type: type ?? null,
+    image: img ?? null,
+  };
   if (typeof username == "string") {
     return axios
       .post(`http://localhost:8080/noti/${username}`, payload)

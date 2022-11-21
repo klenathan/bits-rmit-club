@@ -7,6 +7,7 @@ import * as crypto from "crypto";
 import { Club } from "../../Clubs/Models/Club.model";
 import { UserValidator } from "../Models/Validation.model";
 import MailService from "../../Email/mail.service";
+import sharp from "sharp";
 
 export default class AuthService extends BaseService<User> {
   declare db: Sequelize;
@@ -64,9 +65,9 @@ export default class AuthService extends BaseService<User> {
   };
 
   validateUser = async (username: string, key: string) => {
-    return await UserValidator.findOne({where: {username: username}})
+    return await UserValidator.findOne({ where: { username: username } })
       .then((result) => {
-        if (result?.key == 'null') {
+        if (result?.key == "null") {
           throw new CustomError(
             "USER_VERIFIED",
             400,
@@ -79,11 +80,10 @@ export default class AuthService extends BaseService<User> {
             "Wrong verification key"
           );
         // result.$set('key', null)
-        result.update({key: 'null'} )
+        result.update({ key: "null" });
         return true;
       })
       .then((r) => {
-        
         User.update(
           { status: "active" },
           { where: { username: username } }
@@ -97,14 +97,21 @@ export default class AuthService extends BaseService<User> {
       });
   };
 
-  signUp = async (payload: Partial<User>): Promise<User> => {
+  signUp = async (
+    payload: Partial<User>,
+    files: Express.Multer.File[]
+  ): Promise<User> => {
     if (payload.password) {
       let password: string = payload.password;
+
+      const newFileName = `avatar-${Date.now()}-${files[0].originalname}`;
+      let avatar = files.length == 0 ? "heh.png" : newFileName;
       const hashPassword = crypto
         .createHash("sha256")
         .update(password)
         .digest("hex");
       payload.password = hashPassword;
+      
 
       let randomToken = (Math.random() + 1)
         .toString(36)
@@ -124,6 +131,13 @@ export default class AuthService extends BaseService<User> {
         .catch((e) => {
           throw new CustomError(e.name, 400, e.message);
         });
+
+      await sharp(files[0].buffer)
+        .toFile(`Images/${newFileName}`)
+        .catch((e) => {
+          throw new CustomError(e.name, 400, e.message);
+        });
+        payload.avatar = newFileName
 
       return await User.create(payload).catch((e) => {
         if (e.name == "SequelizeUniqueConstraintError") {

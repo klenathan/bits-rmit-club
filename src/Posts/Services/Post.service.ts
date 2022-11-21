@@ -143,7 +143,7 @@ export default class PostService {
   notifyNewLike = async (club: Club, username: string) => {
     let user = await User.findByPk(username);
     let content = `${user?.firstName} ${user?.lastName} has like ${club.name}'s post`;
-    return await NewNotiUtil(club.president, content, user?.avatar);
+    return await NewNotiUtil(club.president, content, "post_like", user?.avatar);
   };
 
   removeLikePost = async (postID: string, userID: string) => {
@@ -370,6 +370,6 @@ export default class PostService {
     let memberUsername = members.map((mem) => {
       return mem.username;
     });
-    await NewNotiUtil(memberUsername, content, club.avatar);
+    await NewNotiUtil(memberUsername, content, "new_post", club.avatar);
   };
 }

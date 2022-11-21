@@ -11,14 +11,16 @@ export default class NotiController {
   }
 
   newNoti = async (req: Request, res: Response, next: NextFunction) => {
-    // console.log(req.body);
     try {
       const username = req.params.id;
       const content = req.body.content;
       const image = req.body.image ?? null;
-      return await this.services.newNoti(username, content, image).then((r) => {
-        res.send(r);
-      });
+      const type = req.body.type ?? null;
+      return await this.services
+        .newNoti(username, type, content, image)
+        .then((r) => {
+          res.send(r);
+        });
     } catch (e) {
       return next(e);
     }

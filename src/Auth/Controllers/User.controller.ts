@@ -50,6 +50,7 @@ export default class AuthController {
 
   signUp = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      let files = req.files as Express.Multer.File[];
       let payload: Partial<User> = req.body;
       let regex = new RegExp("s[0-9]+@rmit.edu.vn");
       if (payload.email) {
@@ -60,9 +61,9 @@ export default class AuthController {
           });
         }
       }
+      // console.log("files:", files[0].originalname);
       
-      
-      return await this.services.signUp(payload).then((result) => {
+      return await this.services.signUp(payload, files).then((result) => {
         res.status(200).send(result);
       });
     } catch (e) {
@@ -72,15 +73,15 @@ export default class AuthController {
 
   validateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      return await this.services.validateUser(req.body.username, req.body.key).then(
-        result => {
-          return res.send({success: result})
-        }
-      )
+      return await this.services
+        .validateUser(req.body.username, req.body.key)
+        .then((result) => {
+          return res.send({ success: result });
+        });
     } catch (e) {
-      return next(e)
+      return next(e);
     }
-  }
+  };
 
   updateUser = async (req: Request, res: Response, next: NextFunction) => {
     try {

@@ -14,9 +14,15 @@ export default class NotiService {
     this.ws = ws;
   }
 
-  newNoti = async (username: string, content: string, img?: string) => {
+  newNoti = async (
+    username: string,
+    type: string,
+    content: string,
+    img?: string
+  ) => {
     const notiPackage = {
       image: img ?? null,
+      type: type ?? null,
       content: content,
     };
     let user = await User.findByPk(username, {

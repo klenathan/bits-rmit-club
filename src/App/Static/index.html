@@ -28,6 +28,7 @@
 <body>
     <h1>Test Site</h1>
     <h2 id="welcome-txt" style="color: red">♥</h2>
+    <div id="profile-wrapper"></div>
     <div>
         <form action="" id="ws-form">
             <input type="text" name="" autofocus id="input">
@@ -74,6 +75,10 @@
             welcomeTxt.innerText = `Welcome, guest ♥`
         }
         if (localStorage.getItem('user')) {
+            let profilePic = document.createElement('img')
+            profilePic.src = 'http://localhost:8080/image/' + JSON.parse(localStorage.getItem('user')).avatar
+            profilePic.style.height = '150px'
+            document.getElementById('profile-wrapper').appendChild(profilePic)
             fetch("/post/feed/" + JSON.parse(localStorage.getItem('user')).username)
                 .then(response => {
                     return response.json()
@@ -164,6 +169,7 @@
                         throw new Error("WRONG_CREDENTIAL")
                     } else if (result.status == 200) {
                         console.log(result)
+
                         localStorage.setItem("user", JSON.stringify(result));
                         return result
                     } else {

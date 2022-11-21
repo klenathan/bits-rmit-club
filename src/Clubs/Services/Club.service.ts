@@ -5,6 +5,7 @@ import { Club } from "../Models/Club.model";
 import { ClubUser } from "../Models/ClubUser.model";
 import NotFoundError from "../../App/Middlewares/Errors/NotFoundError";
 import { NewNotiUtil } from "../../Base/Utils/notiEvent";
+import sharp from "sharp";
 
 export default class ClubService {
   declare db: Sequelize;
@@ -12,12 +13,20 @@ export default class ClubService {
     this.db = db;
   }
 
-  create = async (payload: Partial<Club>) => {
+  create = async (payload: Partial<Club>, avatar: Express.Multer.File) => {
     const presidentUser = await User.findByPk(payload.president, {
       attributes: { exclude: ["password"] },
     });
 
     if (presidentUser) {
+      // Ava handle
+      const newFileName = `clubAva-${Date.now()}-${avatar.originalname}`;
+      await sharp(avatar.buffer)
+        .toFile(`Images/${newFileName}`)
+        .catch((e) => {
+          throw new CustomError(e.name, 400, e.message);
+        });
+      payload.avatar = newFileName;
       let newClub = await Club.create(payload, { include: User }).catch((e) => {
         throw new CustomError(e.name, 400, e.message);
       });
@@ -200,6 +209,6 @@ export default class ClubService {
     let memberUsername = members.map((mem) => {
       return mem.username;
     });
-    await NewNotiUtil(memberUsername, content, club.avatar);
+    await NewNotiUtil(memberUsername, content, "new_president", club.avatar);
   };
 }
