@@ -17,7 +17,11 @@ export default class WS {
 
   constructor(httpServer?: http.Server | https.Server) {
     if (httpServer) this.httpServer = httpServer;
-    this.io = new Server(this.httpServer);
+    this.io = new Server(this.httpServer, {
+      cors: {
+        origin: "*",
+      },
+    });
     this.currentLobby = {};
   }
 
