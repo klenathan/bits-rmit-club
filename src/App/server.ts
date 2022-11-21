@@ -19,6 +19,8 @@ import Irouter from "../Base/Types/routerInterface";
 import path from "path";
 import WS from "../WebSocket";
 
+import NotiRouter from "../Notification/Notification.routes";
+
 export default class Server {
   public instance: Application;
   private server: any;
@@ -30,22 +32,21 @@ export default class Server {
   private httpServer: http.Server;
   private routerObj: Irouter;
 
+  // private noti: NotiRouter;
+
   public constructor(PORT: number, db: Sequelize, routerObj: Irouter) {
     this.instance = express();
     this.db = db;
-    this;
     this.PORT = PORT;
     this.routerObj = routerObj;
     this.httpServer = createServer(this.instance);
-    this.webSocket = new WS(this.httpServer)
-
+    this.webSocket = new WS(this.httpServer);
 
     // Construct methods
     this.middleware();
     this.webSocket.test();
     this.routing();
     this.errorHandlers();
-
   }
 
   public start() {
@@ -62,13 +63,14 @@ export default class Server {
     this.instance.use(express.json());
     this.instance.use(express.urlencoded({ extended: true }));
   }
- 
+
   // Routers
   private routing() {
     const router = new MainRouter(this.db);
     router.register(this.instance);
 
-    // External routing for external packages
+    this.instance.use("/noti", new NotiRouter(this.db, this.webSocket).routes);
+
     for (let route of this.routerObj.routers) {
       if (route.middlewares)
         this.instance.use(route.prefix, route.middlewares, route.instance);
@@ -80,9 +82,7 @@ export default class Server {
     });
 
     this.instance.get("/*", (req, res) => {
-      res
-        .status(200)
-        .sendFile(__dirname + "/Static/404.html");
+      res.status(200).sendFile(__dirname + "/Static/404.html");
     });
   }
 

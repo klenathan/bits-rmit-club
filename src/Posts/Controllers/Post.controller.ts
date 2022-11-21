@@ -33,6 +33,7 @@ export default class PostController {
       return next(e);
     }
   };
+
   getAllPost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       return await this.service.getAll().then((result) => {
@@ -59,14 +60,15 @@ export default class PostController {
       var files = req.files as Express.Multer.File[];
       await this.service.authorizationCheck(req.body.user, req.body.author);
       let createResult;
-      console.log(req.body);
+      // console.log(req.body);
 
       if (!files) {
         createResult = await this.service.create(req.body);
       } else {
         createResult = await this.service.createWithImages(req.body, files);
       }
-
+      
+      
       return res.send(createResult);
     } catch (e) {
       return next(e);
@@ -120,7 +122,7 @@ export default class PostController {
   deletePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.body.user) {
-        return next(new CustomError("INVALID_INFO", 400, "Invalid username"))
+        return next(new CustomError("INVALID_INFO", 400, "Invalid username"));
       }
       return await this.service
         .deletePost(req.body.user, req.params.id)

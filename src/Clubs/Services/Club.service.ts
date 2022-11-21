@@ -4,6 +4,7 @@ import CustomError from "../../App/Middlewares/Errors/CustomError";
 import { Club } from "../Models/Club.model";
 import { ClubUser } from "../Models/ClubUser.model";
 import NotFoundError from "../../App/Middlewares/Errors/NotFoundError";
+import { NewNotiUtil } from "../../Base/Utils/notiEvent";
 
 export default class ClubService {
   declare db: Sequelize;
@@ -178,9 +179,27 @@ export default class ClubService {
       }
     });
     let curr = currentPresident?.username ?? "none";
+
+    let noti = await Club.findByPk(clubId).then(async (r) => {
+      if (!r) {
+        return false;
+      }
+      await this.notifyNewPresident(r, clubUser);
+      return true;
+    });
+
     return {
       message: `${clubUser.username} has been promoted to president, replacing ${curr}`,
       newPresident: clubUser,
     };
+  };
+
+  notifyNewPresident = async (club: Club, newPresident: ClubUser) => {
+    let content = `${newPresident.username} has been promoted to president for club ${club.name}`;
+    let members = await club.$get("member");
+    let memberUsername = members.map((mem) => {
+      return mem.username;
+    });
+    await NewNotiUtil(memberUsername, content, club.avatar);
   };
 }

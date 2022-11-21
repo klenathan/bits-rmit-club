@@ -3,6 +3,9 @@ import multer from "multer";
 import { Sequelize } from "sequelize-typescript";
 import AuthController from "../Controllers/User.controller";
 
+import NotiController from "../../Notification/Notification.controller";
+
+
 const upload = multer()
 
 export default class AuthRouter {
@@ -12,11 +15,15 @@ export default class AuthRouter {
   constructor(db: Sequelize) {
     this.routes = Router()
     this.controller = new AuthController(db)
+
+    
+
     this.routes.post("/login", this.controller.login)
     .get("/",  this.controller.getAllUser) 
     .post("/verify", this.controller.validateUser)
-    .get("/:id", this.controller.getUserInfo)
     .post("/signup", this.controller.signUp)
     .put("/:username", this.controller.updateUser)
+    .get("/:id", this.controller.getUserInfo)
+    
   }
 }

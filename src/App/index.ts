@@ -12,12 +12,17 @@ import { UserValidator } from "../Auth/Models/Validation.model";
 import ClubPackage from "../Clubs";
 import { ClubUser } from "../Clubs/Models/ClubUser.model";
 import { Club } from "../Clubs/Models/Club.model";
-// post
+// Posts
 import { Post } from "../Posts/Models/Post.model";
 import { PostComment } from "../Posts/Models/Comment.model";
 import { PostLike } from "../Posts/Models/PostLike.model";
 
 import ImgRouter from "../ImageProcess/Image.routes";
+
+// Notifications
+import { Notification } from "../Notification/Notification.model";
+import { UserNoti } from "../Notification/UserNoti.model";
+
 
 const PORT = 8080;
 
@@ -29,19 +34,17 @@ db.addModels([
   PostLike,
   PostComment,
   UserValidator,
+  Notification,
+  UserNoti,
 ]);
 
 const auth = new AuthPackage(db);
 const post = new PostPackage(db);
 const club = new ClubPackage(db);
 
+
 const routerObj: Irouter = {
   routers: [
-    // {
-    //   prefix: "/product",
-    //   middlewares: [verifyToken("access"), verifyUserRole("Admin")],
-    //   instance: sale.productRouter,
-    // }
     { prefix: "/mail", instance: new MailRouter(db).router },
     { prefix: "/auth", instance: auth.router },
     { prefix: "/post", instance: post.router },

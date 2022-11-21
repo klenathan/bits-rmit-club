@@ -12,7 +12,7 @@ export default class ImgRouter {
     this.routes = Router();
     // this.controller = new PostController(db)
     this.routes.get("/:img", async (req, res) => {
-      console.log(path.join(__dirname, "/../../Images/", req.params.img));
+      // console.log(path.join(__dirname, "/../../Images/", req.params.img));
       res.sendFile(path.join(__dirname, "/../../Images/", req.params.img));
 
       // res.send())

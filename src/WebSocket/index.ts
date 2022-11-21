@@ -1,6 +1,8 @@
 import { Server, Socket } from "socket.io";
 import https from "https";
 import http, { createServer } from "http";
+import CustomError from "../App/Middlewares/Errors/CustomError";
+import NotFoundError from "../App/Middlewares/Errors/NotFoundError";
 
 interface user {
   username: string;
@@ -17,16 +19,12 @@ export default class WS {
     if (httpServer) this.httpServer = httpServer;
     this.io = new Server(this.httpServer);
     this.currentLobby = {};
-    // this.io.on("connection", (socket) => {
-    //   console.log(socket.id);
-    // })
-    this.notification(this.io);
   }
 
   test() {
     this.io.on("connection", (socket) => {
       let username = socket.handshake.query.loggeduser;
-      console.log(username);
+      // console.log(username);
 
       if (!username) {
         throw new Error("no username found");
@@ -37,7 +35,7 @@ export default class WS {
       if (!(username in this.currentLobby)) {
         this.currentLobby[username] = {};
       }
-      console.log(this.currentLobby[username]["sockets"]);
+      // console.log(this.currentLobby[username]["sockets"]);
 
       if (!this.currentLobby[username]["sockets"]) {
         this.currentLobby[username]["sockets"] = [];
@@ -58,10 +56,8 @@ export default class WS {
         `${socket.id} connected with name ${username} | ${this.io.engine.clientsCount} | `
       );
 
-      socket.emit("init", { id: socket.id });
-
       socket.on("chat message", (msg) => {
-        this.notification(this.io);
+        // this.notification("admin");
         console.log(msg);
 
         let sendData = { username: username, msg: msg.msg };
@@ -87,14 +83,15 @@ export default class WS {
         this.io.emit("updateOnlineList", Object.keys(this.currentLobby));
       });
     });
-
-    // this.io.on("disconnect", (socket) => {
-    //   this.io.emit('connection', `${socket.id} has disconnected`)
-    // })
   }
 
-  notification(io: Server) {
-    io.emit("notification", `New noti`);
-    // socket.broadcast.emit("notification", `New noti`);
+  notification(receiver: string, payload: any) {
+    if (!(receiver in this.currentLobby)) {
+      return;
+    }
+
+    this.currentLobby[receiver]["sockets"].map((socket: string) => {
+      this.io.to(socket).emit("notification", payload);
+    });
   }
 }

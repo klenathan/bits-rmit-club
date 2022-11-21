@@ -9,6 +9,10 @@ import {
   BelongsToMany,
   Default,
 } from "sequelize-typescript";
+
+import { Notification } from "../../Notification/Notification.model";
+import { UserNoti } from "../../Notification/UserNoti.model";
+
 import { Club } from "../../Clubs/Models/Club.model";
 import { ClubUser } from "../../Clubs/Models/ClubUser.model";
 
@@ -59,4 +63,7 @@ export class User extends Model {
 
   @BelongsToMany(() => Club, () => ClubUser)
   member!: Club[];
+
+  @BelongsToMany(() => Notification, () => UserNoti)
+  has!: Notification[];
 }

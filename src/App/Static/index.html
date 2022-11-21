@@ -116,31 +116,29 @@
                         newPost.appendChild(author)
                         newPost.appendChild(avt)
                         newPost.appendChild(createdAt)
-                        // newPost.appendChild(name)
                         newPost.appendChild(status)
                         if (post.imgLink) {
-                            img = document.createElement('img')
-                            img.style.maxHeight = "400px"
-                            img.src = `image/${post.imgLink}`
-                            newPost.appendChild(img)
+                            for (let i in post.imgLink) {
+                                img = document.createElement('img')
+                                img.style.maxHeight = "400px"
+                                img.src = `image/${post.imgLink[i]}`
+                                newPost.appendChild(img)
+                            }
                         }
                         newPost.appendChild(likeCount)
                         newPost.appendChild(commentsDiv)
-
-                        // newPost.innerText = JSON.stringify(result)
                         document.getElementById("post-wrapper").appendChild(newPost)
                     }
-
                 })
         }
 
-        fetch("http://localhost:8080/auth")
-            .then(response => {
-                return response.json()
-            })
-            .then(result => {
-                console.log(result);
-            })
+        // fetch("http://localhost:8080/auth")
+        //     .then(response => {
+        //         return response.json()
+        //     })
+        //     .then(result => {
+        //         console.log(result);
+        //     })
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
@@ -165,7 +163,6 @@
                         console.log(result.message);
                         throw new Error("WRONG_CREDENTIAL")
                     } else if (result.status == 200) {
-                        // console.log("Login Success")
                         console.log(result)
                         localStorage.setItem("user", JSON.stringify(result));
                         return result
@@ -181,9 +178,6 @@
 
     </script>
     <script>
-        // document.onload = function () {
-            // document.getElementById("input").autofocus
-        
 
         let currUsername = JSON.parse(localStorage.getItem('user')).username
         console.log(currUsername);
@@ -198,7 +192,6 @@
                 socket.emit('chat message', { username: "test user", msg: input.value });
                 input.value = '';
             }
-            // document.getElementById("input").focus();
         });
         let chatWrapper = document.getElementById('chat-wrapper')
 
@@ -228,6 +221,10 @@
         });
         socket.on("notification", (msg) => {
             console.log(msg);
+            let newMess = document.createElement('p')
+            newMess.style.background = 'yellowgreen'
+            newMess.innerText = `${msg.id}: ${msg.content} ${msg.image}`
+            chatWrapper.appendChild(newMess)
         })
     </script>
 </body>

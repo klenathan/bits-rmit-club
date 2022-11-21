@@ -9,6 +9,7 @@ import { PostLike } from "../Models/PostLike.model";
 import { PostComment } from "../Models/Comment.model";
 import { ClubUser } from "../../Clubs/Models/ClubUser.model";
 import NotFoundError from "../../App/Middlewares/Errors/NotFoundError";
+import { NewNotiUtil } from "../../Base/Utils/notiEvent";
 
 export default class PostService {
   declare db: Sequelize;
@@ -52,7 +53,6 @@ export default class PostService {
       include: Club,
     }).catch((e) => {
       console.log(e);
-
       throw new CustomError(e.name, 400, e.message);
     });
   };
@@ -74,8 +74,7 @@ export default class PostService {
           });
         payload.imgLink.push(newFileName);
       }
-
-      console.log(payload.imgLink == null);
+      // console.log(payload.imgLink == null);
 
       if (payload.content == null && payload.imgLink.length == 0) {
         throw new CustomError(
@@ -84,17 +83,25 @@ export default class PostService {
           "Post must include content or picture"
         );
       }
-      const result = await this.db.transaction(async (t) => {
-        const newPost = await Post.create(payload, {
-          include: Club,
-          transaction: t,
-        }).catch((e) => {
+      // const result = await this.db.transaction(async (t) => {
+      const newPost = await Post.create(payload, {
+        include: [Club],
+        // transaction: t,
+      })
+        .then(async (r) => {
+          // let result = r
+          let club = await r.$get("postAuthor");
+          if (club) {
+            // console.log(club.clubid);
+            this.notiForClubMember(club);
+          }
+          // console.log()
+          return r;
+        })
+        .catch((e) => {
           throw new CustomError(e.name, 400, e.message);
         });
-
-        return newPost;
-      });
-      return result;
+      return newPost;
     } catch (error: any) {
       throw new CustomError(error.name, 400, error.message);
     }
@@ -102,7 +109,7 @@ export default class PostService {
 
   // LikePost
   likePost = async (postID: string, userID: string) => {
-    let post = await Post.findByPk(postID).catch((e) => {
+    let post = await Post.findByPk(postID, { include: [Club] }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
 
@@ -120,9 +127,23 @@ export default class PostService {
       );
     }
 
-    return await post.$add("likes", userID).catch((e) => {
-      throw new CustomError(e.name, 400, e.message);
-    });
+    let postAuthor: Club = post.postAuthor;
+
+    return await post
+      .$add("likes", userID)
+      .then((r) => {
+        this.notifyNewLike(postAuthor, userID);
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+  };
+
+  notifyNewLike = async (club: Club, username: string) => {
+    let user = await User.findByPk(username);
+    let content = `${user?.firstName} ${user?.lastName} has like ${club.name}'s post`;
+    return await NewNotiUtil(club.president, content, user?.avatar);
   };
 
   removeLikePost = async (postID: string, userID: string) => {
@@ -150,6 +171,8 @@ export default class PostService {
   };
 
   getFeedForUser = async (username: string) => {
+    // await NewNoti(username, "content");
+
     let userClubs = await User.findByPk(username, { include: Club })
       .then((result) => {
         if (!result)
@@ -339,5 +362,14 @@ export default class PostService {
         });
     }
     return { message: "UNKNOWN_ERR" };
+  };
+
+  notiForClubMember = async (club: Club) => {
+    let content = `${club.name} has posted a new post, check out now`;
+    let members = await club.$get("member");
+    let memberUsername = members.map((mem) => {
+      return mem.username;
+    });
+    await NewNotiUtil(memberUsername, content, club.avatar);
   };
 }
