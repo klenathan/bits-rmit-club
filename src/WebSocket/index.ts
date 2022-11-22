@@ -94,7 +94,8 @@ export default class WS {
 
   notification(receiver: string, payload: any) {
     if (!(receiver in this.currentLobby)) {
-      console.log("receiver is not in lobby");
+      // console.log();
+      console.log("receiver is not in lobby", this.currentLobby);
       
       return;
     }
