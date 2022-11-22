@@ -18,7 +18,7 @@ export default class NotiController {
       const type = req.body.type ?? null;
       const target = req.body.target ?? null;
       return await this.services
-        .newNoti(username, type, content, image)
+        .newNoti(username, type, content, target, image)
         .then((r) => {
           res.send(r);
         });
