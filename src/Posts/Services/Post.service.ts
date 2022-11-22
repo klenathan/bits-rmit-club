@@ -81,7 +81,6 @@ export default class PostService {
           });
         payload.imgLink.push(newFileName);
       }
-      // console.log(payload.imgLink == null);
 
       if (payload.content == null && payload.imgLink.length == 0) {
         throw new CustomError(

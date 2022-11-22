@@ -150,8 +150,9 @@ export default class ClubService {
             `${username} is already the president`
           );
         } else {
-          await result?.update({ role: "member" });
+          console.log("update");
         }
+        await result?.update({ role: "member" });
         return result;
       })
       .catch((e) => {
@@ -174,8 +175,13 @@ export default class ClubService {
       where: { username: username, cid: clubId },
       attributes: { exclude: ["createdAt"] },
     }).then((result) => {
+      // console.log(result);
+
       if (!result)
-        throw new NotFoundError("USER_NOT_FOUND", `${username} is not found`);
+        throw new NotFoundError(
+          "USER_NOT_FOUND",
+          `${username} is not found in club ${clubId}`
+        );
       if (result.role == "president")
         throw new CustomError(
           "USER_IS_PRESIDENT",
@@ -189,7 +195,11 @@ export default class ClubService {
     });
     let curr = currentPresident?.username ?? "none";
 
-    let noti = await Club.findByPk(clubId).then(async (r) => {
+    // console.log(clubUser);
+
+    await Club.findByPk(clubId).then(async (r) => {
+      r?.update({ president: clubUser.username });
+
       if (!r) {
         return false;
       }
@@ -209,6 +219,12 @@ export default class ClubService {
     let memberUsername = members.map((mem) => {
       return mem.username;
     });
-    await NewNotiUtil(memberUsername, content, `club:${club.clubid}`,"new_president", club.avatar);
+    await NewNotiUtil(
+      memberUsername,
+      content,
+      `club:${club.clubid}`,
+      "new_president",
+      club.avatar
+    );
   };
 }
