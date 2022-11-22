@@ -150,6 +150,8 @@ export default class PostService {
   notifyNewLike = async (club: Club, username: string, post: string) => {
     let user = await User.findByPk(username);
     let content = `${user?.firstName} ${user?.lastName} has like ${club.name}'s post`;
+    console.log(content);
+    
     return await NewNotiUtil(
       club.president,
       content,
