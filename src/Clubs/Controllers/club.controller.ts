@@ -56,6 +56,18 @@ export default class ClubController {
     }
   };
 
+  requestClub = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const username = req.body.username ?? req.body.user;
+      const clubId = req.params.id;
+      return await this.service.requestClub(username, clubId).then((r) => {
+        return res.status(200).send(r);
+      });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
   addNewMember = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const clubID = req.body.clubId;

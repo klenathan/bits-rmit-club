@@ -6,6 +6,8 @@ import {
   ForeignKey,
   BelongsTo,
   NotNull,
+  AllowNull,
+  DataType,
 } from "sequelize-typescript";
 import { User } from "../../Auth/Models/User.model";
 import { Club } from "./Club.model";
@@ -22,5 +24,9 @@ export class ClubUser extends Model {
 
   @Column
   declare role: string
+
+  @AllowNull(false)
+  @Column(DataType.ENUM('pending', 'active', 'banned'))
+  declare status: string
 
 }

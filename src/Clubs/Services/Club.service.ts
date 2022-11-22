@@ -71,6 +71,49 @@ export default class ClubService {
     });
   };
 
+  requestClub = async (username: string, clubId: string) => {
+    let current = await ClubUser.findOne({
+      where: { username: username, cid: clubId },
+    })
+      .then((r) => {
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    if (current) {
+      throw new CustomError(
+        "REQUEST_EXIST",
+        400,
+        `${username} has already requested to club ${clubId}`
+      );
+    }
+
+    let user = await User.findByPk(username).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+
+    if (!user) {
+      throw new NotFoundError("USER_NOT_FOUND", `${username} cannot be found`);
+    }
+
+    let club = await Club.findByPk(clubId).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+
+    if (!club) {
+      throw new NotFoundError("CLUB_NOT_FOUND", `${clubId} cannot be found`);
+    }
+
+    return await club.$add("member", user, {
+      through: {
+        role: "member",
+        status: "pending",
+      },
+    });
+  };
+
   addClubMember = async (
     clubID: string,
     userArr: { username: string; role: string }[]
@@ -104,6 +147,7 @@ export default class ClubService {
         club.$add("member", user, {
           through: {
             role: tempUserDict[user.username],
+            status: "active",
           },
         });
       }
@@ -204,7 +248,7 @@ export default class ClubService {
         return false;
       }
       // console.log();
-      
+
       await this.notifyNewPresident(r, clubUser);
       return true;
     });
@@ -221,8 +265,8 @@ export default class ClubService {
     let memberUsername = members.map((mem) => {
       return mem.username;
     });
-    console.log("new noti: ",content);
-    
+    console.log("new noti: ", content);
+
     await NewNotiUtil(
       memberUsername,
       content,
