@@ -100,7 +100,7 @@ export default class PostService {
           let club = await r.$get("postAuthor");
           if (club) {
             // console.log(club.clubid);
-            this.notiForClubMember(club, newPost.id);
+            this.notiForClubMember(club, r.id);
           }
           // console.log()
           return r;
