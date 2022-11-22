@@ -203,6 +203,8 @@ export default class ClubService {
       if (!r) {
         return false;
       }
+      // console.log();
+      
       await this.notifyNewPresident(r, clubUser);
       return true;
     });
@@ -219,6 +221,8 @@ export default class ClubService {
     let memberUsername = members.map((mem) => {
       return mem.username;
     });
+    console.log("new noti: ",content);
+    
     await NewNotiUtil(
       memberUsername,
       content,
