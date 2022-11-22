@@ -49,12 +49,19 @@ export default class PostService {
         "Post must include content or picture"
       );
     }
-    return await Post.create(payload, {
+    let post = await Post.create(payload, {
       include: Club,
-    }).catch((e) => {
-      console.log(e);
-      throw new CustomError(e.name, 400, e.message);
-    });
+    })
+      .then((r) => {
+        this.notiForClubMember(r.postAuthor, r.id);
+        return r;
+      })
+      .catch((e) => {
+        console.log(e);
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    return post;
   };
   // Create posts with images
   createWithImages = async (
@@ -93,7 +100,7 @@ export default class PostService {
           let club = await r.$get("postAuthor");
           if (club) {
             // console.log(club.clubid);
-            this.notiForClubMember(club);
+            this.notiForClubMember(club, newPost.id);
           }
           // console.log()
           return r;
@@ -128,11 +135,12 @@ export default class PostService {
     }
 
     let postAuthor: Club = post.postAuthor;
+    // let postID: string  = post.id
 
     return await post
       .$add("likes", userID)
       .then((r) => {
-        this.notifyNewLike(postAuthor, userID);
+        this.notifyNewLike(postAuthor, userID, postID);
         return r;
       })
       .catch((e) => {
@@ -140,10 +148,16 @@ export default class PostService {
       });
   };
 
-  notifyNewLike = async (club: Club, username: string) => {
+  notifyNewLike = async (club: Club, username: string, post: string) => {
     let user = await User.findByPk(username);
     let content = `${user?.firstName} ${user?.lastName} has like ${club.name}'s post`;
-    return await NewNotiUtil(club.president, content, "post_like", user?.avatar);
+    return await NewNotiUtil(
+      club.president,
+      content,
+      `post:${post}`,
+      "post_like",
+      user?.avatar
+    );
   };
 
   removeLikePost = async (postID: string, userID: string) => {
@@ -364,12 +378,18 @@ export default class PostService {
     return { message: "UNKNOWN_ERR" };
   };
 
-  notiForClubMember = async (club: Club) => {
+  notiForClubMember = async (club: Club, pid: string) => {
     let content = `${club.name} has posted a new post, check out now`;
     let members = await club.$get("member");
     let memberUsername = members.map((mem) => {
       return mem.username;
     });
-    await NewNotiUtil(memberUsername, content, "new_post", club.avatar);
+    await NewNotiUtil(
+      memberUsername,
+      content,
+      `post:${pid}`,
+      "new_post",
+      club.avatar
+    );
   };
 }

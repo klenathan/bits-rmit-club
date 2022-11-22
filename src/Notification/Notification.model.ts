@@ -24,6 +24,9 @@ export class Notification extends Model {
   declare image: string;
 
   @Column
+  declare target: string;
+
+  @Column
   declare type: string;
 
   @AllowNull(false)

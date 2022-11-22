@@ -3,6 +3,7 @@ import axios from "axios";
 export const NewNotiUtil = async (
   username: string | string[],
   content: string,
+  target: string,
   type?: string,
   img?: string
 ) => {
@@ -11,6 +12,7 @@ export const NewNotiUtil = async (
   payload = {
     content: content,
     type: type ?? null,
+    target: target ?? null,
     image: img ?? null,
   };
   if (typeof username == "string") {

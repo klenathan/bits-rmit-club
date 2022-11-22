@@ -18,11 +18,13 @@ export default class NotiService {
     username: string,
     type: string,
     content: string,
+    target: string,
     img?: string
   ) => {
     const notiPackage = {
       image: img ?? null,
       type: type ?? null,
+      target: target,
       content: content,
     };
     let user = await User.findByPk(username, {

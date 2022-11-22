@@ -209,6 +209,6 @@ export default class ClubService {
     let memberUsername = members.map((mem) => {
       return mem.username;
     });
-    await NewNotiUtil(memberUsername, content, "new_president", club.avatar);
+    await NewNotiUtil(memberUsername, content, `club:${club.clubid}`,"new_president", club.avatar);
   };
 }
