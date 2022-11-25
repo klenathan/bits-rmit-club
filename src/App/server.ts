@@ -73,8 +73,13 @@ export default class Server {
 
     for (let route of this.routerObj.routers) {
       if (route.middlewares)
-        this.instance.use(route.prefix, route.middlewares, route.instance);
-      else this.instance.use(route.prefix, route.instance);
+        this.instance.use(
+          route.prefix,
+          this.logMiddleware,
+          route.middlewares,
+          route.instance
+        );
+      else this.instance.use(route.prefix, this.logMiddleware, route.instance);
     }
 
     this.instance.get("/", (req, res) => {
@@ -90,5 +95,13 @@ export default class Server {
   private errorHandlers() {
     this.instance.use(handlers.handleError);
     this.instance.use(handlers.invalidPathHandler);
+  }
+
+  private logMiddleware(req: Request, res: Response, next: NextFunction) {
+    // console.log(req.baseUrl);
+
+    if (req.baseUrl != "/image")
+      console.log(req.method, req.baseUrl, req.url, req.body);
+    return next();
   }
 }
