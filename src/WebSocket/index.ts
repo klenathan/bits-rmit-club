@@ -81,7 +81,7 @@ export default class WS {
           socket.broadcast.emit("server", sendData);
         });
 
-        socket.on("disconnect", (msg) => {
+        socket.on("disconnect", async (msg) => {
           if (!username) {
             throw new Error("no username found");
           } else if (typeof username != "string") {
@@ -95,8 +95,18 @@ export default class WS {
           if (this.currentLobby[username]["sockets"].length == 0) {
             delete this.currentLobby[username];
           }
+          let currentOnline: { username: string; avatar: string | null }[] = [];
+          for (let username of Object.keys(this.currentLobby)) {
+            let user = await User.findByPk(username).then((r) => {
+              if (!r) {
+                return { username: username, avatar: null };
+              }
+              return { username: username, avatar: r?.avatar };
+            });
+            currentOnline.push(user);
+          }
           this.io.emit("connectionChange", `${username} has disconnected`);
-          this.io.emit("updateOnlineList", Object.keys(this.currentLobby));
+          this.io.emit("updateOnlineList", currentOnline);
         });
       }
       // username = 'test'
