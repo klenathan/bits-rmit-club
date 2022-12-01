@@ -10,6 +10,7 @@ import { PostComment } from "../Models/Comment.model";
 import { ClubUser } from "../../Clubs/Models/ClubUser.model";
 import NotFoundError from "../../App/Middlewares/Errors/NotFoundError";
 import { NewNotiUtil } from "../../Base/Utils/notiEvent";
+import { ClubEvent } from "../Models/Event.model";
 
 export default class PostService {
   declare db: Sequelize;
@@ -134,7 +135,6 @@ export default class PostService {
     }
 
     let postAuthor: Club = post.postAuthor;
-    // let postID: string  = post.id
 
     return await post
       .$add("likes", userID)
@@ -151,7 +151,7 @@ export default class PostService {
     let user = await User.findByPk(username);
     let content = `${user?.firstName} ${user?.lastName} has like ${club.name}'s post`;
     console.log(content);
-    
+
     return await NewNotiUtil(
       club.president,
       content,
@@ -186,8 +186,6 @@ export default class PostService {
   };
 
   getFeedForUser = async (username: string) => {
-    // await NewNoti(username, "content");
-
     let userClubs = await User.findByPk(username, { include: Club })
       .then((result) => {
         if (!result)
@@ -392,5 +390,112 @@ export default class PostService {
       "new_post",
       club.avatar
     );
+  };
+
+  getAllEvent = async () => {
+    let events = await ClubEvent.findAll({
+      where: { startDate: { [Op.gte]: Date() } },
+      include: Club,
+    }).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+
+    return events;
+  };
+
+  notiEventForClubMember = async (club: Club, pid: string) => {
+    let content = `${club.name} has a new event, check out now`;
+    let members = await club.$get("member");
+    let memberUsername = members.map((mem) => {
+      return mem.username;
+    });
+    await NewNotiUtil(
+      memberUsername,
+      content,
+      `event:${pid}`,
+      "new_event",
+      club.avatar
+    );
+  };
+
+  createEvent = async (payload: Partial<ClubEvent>) => {
+    if (payload.content == null && payload.imgLink == null) {
+      throw new CustomError(
+        "INVALID_EVENT",
+        400,
+        "Event must include content or picture"
+      );
+    }
+    let post = await ClubEvent.create(payload, {
+      include: Club,
+    })
+      .then((r) => {
+        this.notiForClubMember(r.eventAuthor, r.id);
+        return r;
+      })
+      .catch((e) => {
+        console.log(e);
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    return post;
+  };
+  // Create posts with images
+  createEventWithImages = async (
+    payload: Partial<ClubEvent>,
+    files: Express.Multer.File[]
+  ) => {
+    try {
+      payload.imgLink = [];
+      for (let file of files) {
+        let fileName = file.originalname;
+        const newFileName = `eventIMG-${Date.now()}-${fileName}`;
+        // Write file to database (")> if we have one
+        await sharp(file.buffer)
+          .toFile(`Images/${newFileName}`)
+          .catch((e) => {
+            throw new CustomError(e.name, 400, e.message);
+          });
+        payload.imgLink.push(newFileName);
+      }
+
+      if (payload.content == null && payload.imgLink.length == 0) {
+        throw new CustomError(
+          "INVALID_EventT",
+          400,
+          "Event must include content or picture"
+        );
+      }
+      const newEvent = await ClubEvent.create(payload, {
+        include: [Club],
+      })
+        .then(async (r) => {
+          let club = await r.$get("eventAuthor");
+          if (club) {
+            this.notiForClubMember(club, r.id);
+          }
+          return r;
+        })
+        .catch((e) => {
+          throw new CustomError(e.name, 400, e.message);
+        });
+      return newEvent;
+    } catch (error: any) {
+      throw new CustomError(error.name, 400, error.message);
+    }
+  };
+
+  updateEvent = async (id: string, payload: Partial<ClubEvent>) => {
+    let clubEvent = await ClubEvent.findByPk(id).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+
+    if (!clubEvent) {
+      throw new NotFoundError("NOT_FOUND", `Event ${id} cannot be found`);
+    }
+
+    let result = await ClubEvent.update(payload, { where: { id: id } });
+
+    return result;
   };
 }

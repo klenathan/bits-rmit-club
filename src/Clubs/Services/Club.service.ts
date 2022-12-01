@@ -219,8 +219,6 @@ export default class ClubService {
       where: { username: username, cid: clubId },
       attributes: { exclude: ["createdAt"] },
     }).then((result) => {
-      // console.log(result);
-
       if (!result)
         throw new NotFoundError(
           "USER_NOT_FOUND",
@@ -238,17 +236,12 @@ export default class ClubService {
       }
     });
     let curr = currentPresident?.username ?? "none";
-
-    // console.log(clubUser);
-
     await Club.findByPk(clubId).then(async (r) => {
       r?.update({ president: clubUser.username });
 
       if (!r) {
         return false;
       }
-      // console.log();
-
       await this.notifyNewPresident(r, clubUser);
       return true;
     });

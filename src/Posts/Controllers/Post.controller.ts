@@ -67,8 +67,7 @@ export default class PostController {
       } else {
         createResult = await this.service.createWithImages(req.body, files);
       }
-      
-      
+
       return res.send(createResult);
     } catch (e) {
       return next(e);
@@ -128,6 +127,49 @@ export default class PostController {
         .deletePost(req.body.user, req.params.id)
         .then((result) => {
           return res.status(200).send(result);
+        });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  getAllEvent = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return await this.service.getAllEvent().then((r) => {
+        return res.status(200).send(r);
+      });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  createNewEvent = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      var files = req.files as Express.Multer.File[];
+      await this.service.authorizationCheck(req.body.user, req.body.author);
+      let createResult;
+
+      if (!files) {
+        createResult = await this.service.createEvent(req.body);
+      } else {
+        createResult = await this.service.createEventWithImages(
+          req.body,
+          files
+        );
+      }
+
+      return res.send(createResult);
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  updateEvent = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return await this.service
+        .updateEvent(req.params.id, req.body)
+        .then((r) => {
+          return res.status(200).send({ success: `updated ${r} events` });
         });
     } catch (e) {
       return next(e);
