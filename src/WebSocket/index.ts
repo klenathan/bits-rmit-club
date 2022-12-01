@@ -3,6 +3,7 @@ import https from "https";
 import http, { createServer } from "http";
 import CustomError from "../App/Middlewares/Errors/CustomError";
 import NotFoundError from "../App/Middlewares/Errors/NotFoundError";
+import { User } from "../Auth/Models/User.model";
 
 interface user {
   username: string;
@@ -26,7 +27,7 @@ export default class WS {
   }
 
   test() {
-    this.io.on("connection", (socket) => {
+    this.io.on("connection", async (socket) => {
       let username = socket.handshake.query.loggeduser;
       // console.log(username);
 
@@ -40,7 +41,6 @@ export default class WS {
         if (!(username in this.currentLobby)) {
           this.currentLobby[username] = {};
         }
-        // console.log(this.currentLobby[username]["sockets"]);
 
         if (!this.currentLobby[username]["sockets"]) {
           this.currentLobby[username]["sockets"] = [];
@@ -50,7 +50,18 @@ export default class WS {
         }
 
         /// EVENTS
-        this.io.emit("updateOnlineList", Object.keys(this.currentLobby));
+        let currentOnline: { username: string; avatar: string | null }[] = [];
+        for (let username of Object.keys(this.currentLobby)) {
+          let user = await User.findByPk(username).then((r) => {
+            if (!r) {
+              return { username: username, avatar: null };
+            }
+            return { username: username, avatar: r?.avatar };
+          });
+          currentOnline.push(user);
+        }
+        this.io.emit("updateOnlineList", currentOnline);
+        console.log(currentOnline);
 
         this.io.emit(
           "connectionChange",
@@ -96,7 +107,7 @@ export default class WS {
     if (!(receiver in this.currentLobby)) {
       // console.log();
       console.log("receiver is not in lobby", this.currentLobby);
-      
+
       return;
     }
 

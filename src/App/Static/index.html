@@ -204,6 +204,7 @@
         let myId;
 
         socket.on("updateOnlineList", (online) => {
+            console.log(online);
             document.getElementById('online-list').innerText = online
         })
 
