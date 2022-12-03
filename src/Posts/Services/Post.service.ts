@@ -472,7 +472,7 @@ export default class PostService {
         .then(async (r) => {
           let club = await r.$get("eventAuthor");
           if (club) {
-            this.notiForClubMember(club, r.id);
+            this.notiEventForClubMember(club, r.id);
           }
           return r;
         })

@@ -18,7 +18,7 @@ export default class PostRouter {
 
     this.routes
       .get("/", this.controller.getAllPost)
-      .post("/event", this.controller.createNewEvent)
+      .post("/event", upload.any(), this.controller.createNewEvent)
       .get("/event", this.controller.getAllEvent)
       .put("/event/:id", this.controller.updateEvent)
       .post("/", upload.any(), this.controller.create)

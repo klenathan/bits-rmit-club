@@ -5,6 +5,7 @@ import Irouter from "../Base/Types/routerInterface";
 import MailRouter from "../Email/mail.routes";
 import AuthPackage from "../Auth";
 import PostPackage from "../Posts";
+
 // Auth
 import { User } from "../Auth/Models/User.model";
 import { UserValidator } from "../Auth/Models/Validation.model";
@@ -16,6 +17,7 @@ import { Club } from "../Clubs/Models/Club.model";
 import { Post } from "../Posts/Models/Post.model";
 import { PostComment } from "../Posts/Models/Comment.model";
 import { PostLike } from "../Posts/Models/PostLike.model";
+import { ClubEvent } from "../Posts/Models/Event.model";
 
 import ImgRouter from "../ImageProcess/Image.routes";
 
@@ -36,6 +38,7 @@ db.addModels([
   UserValidator,
   Notification,
   UserNoti,
+  ClubEvent
 ]);
 
 const auth = new AuthPackage(db);
