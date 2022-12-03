@@ -150,7 +150,8 @@ export default class PostController {
       let createResult;
 
       if (!files) {
-        createResult = await this.service.createEvent(req.body);
+        // createResult = await this.service.createEvent(req.body);
+        return next(new CustomError("NO_IMG_FOUND", 400, "Please include image on create new event"))
       } else {
         createResult = await this.service.createEventWithImages(
           req.body,
