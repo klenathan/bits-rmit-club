@@ -60,13 +60,18 @@ export default class PostController {
       var files = req.files as Express.Multer.File[];
       await this.service.authorizationCheck(req.body.user, req.body.author);
       let createResult;
-      // console.log(req.body);
+
+      // console.log("files", files);
+      
+      // console.log('body', req.body);
 
       if (!files) {
         createResult = await this.service.create(req.body);
       } else {
         createResult = await this.service.createWithImages(req.body, files);
       }
+
+      // createResult = {mes: "hello"}
 
       return res.send(createResult);
     } catch (e) {

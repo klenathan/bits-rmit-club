@@ -440,7 +440,7 @@ export default class PostService {
 
     return post;
   };
-  // Create posts with images
+  // Create event with images
   createEventWithImages = async (
     payload: Partial<ClubEvent>,
     files: Express.Multer.File[]
