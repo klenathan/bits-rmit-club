@@ -509,24 +509,19 @@ export default class PostService {
       include: [Club],
     });
     for (let post of allPosts) {
-      console.log('post', post.imgLink);
-      
       if (counter >= limit) {
         break;
       } else if (counter + post.imgLink.length > limit) {
-        let remaining = limit - (counter + post.imgLink.length);
+        let remaining = counter + post.imgLink.length - limit;
 
         for (let i = 0; i < remaining; i++) {
-          result.push(post.imgLink[i]);
+          result = [...result, post.imgLink[i]];
         }
       } else if (post.imgLink.length != 0) {
-        result = [...result, ...post.imgLink]
-        
-        
+        result = [...result, ...post.imgLink];
         counter += post.imgLink.length;
       }
     }
-    console.log(result);
     return result;
   };
 }

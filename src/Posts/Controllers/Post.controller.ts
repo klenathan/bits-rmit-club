@@ -190,7 +190,9 @@ export default class PostController {
 
   getClubImages = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      return await this.service.getClubImages("456", 10).then((r) => {
+    let club = req.params.id
+    let limit = req.query.limit as unknown as number
+      return await this.service.getClubImages(club, limit).then((r) => {
         return res.send({images: r})
       });
     } catch (e) {
