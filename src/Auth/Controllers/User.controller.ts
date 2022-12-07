@@ -87,7 +87,7 @@ export default class AuthController {
     try {
       const username = req.params.username;
       let payload = req.body;
-      return this.services.updateUser(username, payload).then((result) => {
+      return await this.services.updateUser(username, payload).then((result) => {
         return res.status(200).send({
           message: `Successfully update user data | ${result} users updated`,
         });
