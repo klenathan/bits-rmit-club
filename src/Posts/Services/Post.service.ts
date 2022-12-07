@@ -498,4 +498,35 @@ export default class PostService {
 
     return result;
   };
+
+  getClubImages = async (clubid: string, limit: number) => {
+    let result: string[] = [];
+    let counter = 0;
+    let allPosts = await Post.findAll({
+      where: {
+        author: clubid,
+      },
+      include: [Club],
+    });
+    for (let post of allPosts) {
+      console.log('post', post.imgLink);
+      
+      if (counter >= limit) {
+        break;
+      } else if (counter + post.imgLink.length > limit) {
+        let remaining = limit - (counter + post.imgLink.length);
+
+        for (let i = 0; i < remaining; i++) {
+          result.push(post.imgLink[i]);
+        }
+      } else if (post.imgLink.length != 0) {
+        result = [...result, ...post.imgLink]
+        
+        
+        counter += post.imgLink.length;
+      }
+    }
+    console.log(result);
+    return result;
+  };
 }

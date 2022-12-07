@@ -62,7 +62,7 @@ export default class PostController {
       let createResult;
 
       // console.log("files", files);
-      
+
       // console.log('body', req.body);
 
       if (!files) {
@@ -156,7 +156,13 @@ export default class PostController {
 
       if (!files) {
         // createResult = await this.service.createEvent(req.body);
-        return next(new CustomError("NO_IMG_FOUND", 400, "Please include image on create new event"))
+        return next(
+          new CustomError(
+            "NO_IMG_FOUND",
+            400,
+            "Please include image on create new event"
+          )
+        );
       } else {
         createResult = await this.service.createEventWithImages(
           req.body,
@@ -177,6 +183,16 @@ export default class PostController {
         .then((r) => {
           return res.status(200).send({ success: `updated ${r} events` });
         });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  getClubImages = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return await this.service.getClubImages("456", 10).then((r) => {
+        return res.send({images: r})
+      });
     } catch (e) {
       return next(e);
     }

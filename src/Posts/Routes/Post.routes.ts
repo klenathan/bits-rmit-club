@@ -27,6 +27,7 @@ export default class PostRouter {
       .delete("/removelike/:pid", this.controller.removeLikePost)
       .get("/feed/:uid", this.controller.getFeed)
       .get("/clubfeed/:id", this.controller.getClubFeed)
+      .get("/clubimage", this.controller.getClubImages)
       .get("/:id", this.controller.getByPk)
       .delete("/:id", this.controller.deletePost);
   }
