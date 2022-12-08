@@ -50,7 +50,7 @@ export default class ClubService {
     return await Club.findByPk(clubID, {
       include: {
         model: User,
-        attributes: ["username", "firstName", "lastName"],
+        attributes: ["username", "firstName", "lastName", "avatar"],
       },
     })
       .then((res) => {
