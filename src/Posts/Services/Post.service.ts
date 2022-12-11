@@ -392,9 +392,16 @@ export default class PostService {
     );
   };
 
-  getAllEvent = async () => {
+  getAllEvent = async (username: string) => {
+    let userClubs = await User.findByPk(username, {include: [Club]})
+    userClubs?.member.forEach(club => {
+      console.log(club.name);
+    })
+
+    let clubArr = userClubs?.member.map(club => club.clubid)
+    
     let events = await ClubEvent.findAll({
-      where: { startDate: { [Op.gte]: Date() } },
+      where: { startDate: { [Op.gte]: Date()},  author: clubArr  },
       include: Club,
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);

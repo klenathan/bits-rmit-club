@@ -139,8 +139,12 @@ export default class PostController {
   };
 
   getAllEvent = async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.query.user) {
+      return next(new CustomError("INVALID_USERNAME", 400, "username params not found"))
+    }
+    let username = req.query.user as string;
     try {
-      return await this.service.getAllEvent().then((r) => {
+      return await this.service.getAllEvent(username).then((r) => {
         return res.status(200).send(r);
       });
     } catch (e) {
