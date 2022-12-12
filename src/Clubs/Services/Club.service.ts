@@ -159,7 +159,7 @@ export default class ClubService {
     return await Club.findAll({
       include: {
         model: User,
-        attributes: ["username", "firstName", "lastName", "role"],
+        attributes: {exclude: ["password"]},
       },
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
