@@ -81,7 +81,10 @@ export default class PostController {
 
   updatePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
+
       let id = req.params.id;
+      
+      
       if (req.body.avatar) {
         return next(
           new CustomError(
@@ -91,9 +94,9 @@ export default class PostController {
           )
         );
       }
-      await this.service.authorizationCheck(req.body.user, req.body.author);
+      // await this.service.authorizationCheck(req.body.user, req.body.author);
       let updateResult = await this.service.updatePost(id, req.body);
-      return res.status(200).send(updateResult);
+      return res.status(200).send({result: `updated post ${id}`});
     } catch (e) {
       return next(e);
     }

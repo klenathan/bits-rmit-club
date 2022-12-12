@@ -116,6 +116,7 @@ export default class PostService {
 
   updatePost = async (id: string, payload: Partial<Post>) => {
     try {
+      console.log(id);
       let result = await Post.update(payload, {where: {id: id}})
       return result;
     } catch (e: any) {
