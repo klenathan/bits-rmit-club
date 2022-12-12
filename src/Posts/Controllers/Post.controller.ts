@@ -79,6 +79,26 @@ export default class PostController {
     }
   };
 
+  updatePost = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let id = req.params.id;
+      if (req.body.avatar) {
+        return next(
+          new CustomError(
+            "INVALID_FIELD",
+            400,
+            "Field avatar is not permited to contain"
+          )
+        );
+      }
+      await this.service.authorizationCheck(req.body.user, req.body.author);
+      let updateResult = await this.service.updatePost(id, req.body);
+      return res.status(200).send(updateResult);
+    } catch (e) {
+      return next(e);
+    }
+  };
+
   likePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
       let pID = req.params.pid;
@@ -140,7 +160,9 @@ export default class PostController {
 
   getAllEvent = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.query.user) {
-      return next(new CustomError("INVALID_USERNAME", 400, "username params not found"))
+      return next(
+        new CustomError("INVALID_USERNAME", 400, "username params not found")
+      );
     }
     let username = req.query.user as string;
     try {

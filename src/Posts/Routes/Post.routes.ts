@@ -22,6 +22,7 @@ export default class PostRouter {
       .get("/event", this.controller.getAllEvent)
       .put("/event/:id", this.controller.updateEvent)
       .post("/", upload.any(), this.controller.create)
+      .put("/update/:id", upload.any(), this.controller.updatePost)
       .post("/like/:pid", this.controller.likePost)
       .post("/comment/:pid", this.controller.createComment)
       .delete("/removelike/:pid", this.controller.removeLikePost)

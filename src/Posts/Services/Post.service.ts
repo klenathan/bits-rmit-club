@@ -114,6 +114,15 @@ export default class PostService {
     }
   };
 
+  updatePost = async (id: string, payload: Partial<Post>) => {
+    try {
+      let result = await Post.update(payload, {where: {id: id}})
+      return result;
+    } catch (e: any) {
+      throw new CustomError(e.name, 400, e.message)
+    }
+  }
+
   // LikePost
   likePost = async (postID: string, userID: string) => {
     let post = await Post.findByPk(postID, { include: [Club] }).catch((e) => {
