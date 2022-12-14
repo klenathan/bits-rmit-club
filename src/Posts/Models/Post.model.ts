@@ -33,7 +33,7 @@ export class Post extends Model {
   @BelongsTo(() => Club, { foreignKey: "author" })
   postAuthor!: Club;
 
-  @Column
+  @Column({type: DataType.TEXT})
   declare content: string;
 
   declare likeCount: number;
