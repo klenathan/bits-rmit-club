@@ -3,7 +3,7 @@ import multer from "multer";
 import { Sequelize } from "sequelize-typescript";
 import AuthController from "../Controllers/User.controller";
 
-import NotiController from "../../Notification/Notification.controller";
+// import NotiController from "../../Notification/Notification.controller";
 
 const upload = multer();
 

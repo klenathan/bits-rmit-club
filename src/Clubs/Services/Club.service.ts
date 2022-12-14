@@ -86,7 +86,7 @@ export default class ClubService {
       throw new CustomError(
         "REQUEST_EXIST",
         400,
-        `${username} has already requested to club ${clubId}`
+        `${username} has already joined or requested to club ${clubId}`
       );
     }
 

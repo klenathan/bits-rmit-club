@@ -129,6 +129,9 @@ export default class AuthService extends BaseService<User> {
           new MailService().sendVerificationMail(payload.email, randomToken);
         })
         .catch((e) => {
+          if (e.name == "SequelizeUniqueConstraintError") {
+            throw new CustomError(e.name, 400, "User already existed");
+          }
           throw new CustomError(e.name, 400, e.message);
         });
 

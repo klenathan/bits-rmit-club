@@ -53,6 +53,9 @@ export default class AuthController {
       let files = req.files as Express.Multer.File[];
       let payload: Partial<User> = req.body;
       let regex = new RegExp("s[0-9]+@rmit.edu.vn");
+
+      // console.log("file", files);
+      
       if (payload.email) {
         if (!regex.test(payload.email)) {
           return res.status(400).send({
