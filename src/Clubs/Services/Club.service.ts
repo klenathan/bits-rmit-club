@@ -13,7 +13,11 @@ export default class ClubService {
     this.db = db;
   }
 
-  create = async (payload: Partial<Club>, avatar: Express.Multer.File) => {
+  create = async (
+    payload: Partial<Club>,
+    avatar: Express.Multer.File,
+    bg: Express.Multer.File
+  ) => {
     const presidentUser = await User.findByPk(payload.president, {
       attributes: { exclude: ["password"] },
     });
@@ -26,9 +30,18 @@ export default class ClubService {
         .catch((e) => {
           throw new CustomError(e.name, 400, e.message);
         });
-        console.log("New Club Ava: ", avatar.originalname);
-        
       payload.avatar = newFileName;
+
+      const newBgName = `clubBg-${Date.now()}-${bg.originalname}`;
+
+      await sharp(bg.buffer)
+        .toFile(`Images/${newBgName}`)
+        .catch((e) => {
+          throw new CustomError(e.name, 400, e.message);
+        });
+
+      payload.background = newBgName;
+
       let newClub = await Club.create(payload, { include: User }).catch((e) => {
         throw new CustomError(e.name, 400, e.message);
       });
@@ -36,7 +49,7 @@ export default class ClubService {
       await newClub.$add("member", presidentUser, {
         through: {
           role: "president",
-          status: "active"
+          status: "active",
         },
       });
       return newClub;
@@ -67,7 +80,6 @@ export default class ClubService {
   };
 
   editClubInfo = async (clubId: string, payload: Partial<Club>) => {
-
     return await Club.update(payload, {
       where: { clubid: clubId },
     }).catch((e) => {
@@ -75,17 +87,17 @@ export default class ClubService {
     });
   };
 
-  changeBackground = async (clubId: string, files: Express.Multer.File[]) => {
-    let backgroundImg = files[0];
+  changeBackground = async (clubId: string, backgroundImg: Express.Multer.File) => {
+    // let backgroundImg = file;
 
-    const newFileName = `clubAva-${Date.now()}-${backgroundImg.originalname}`;
+    const newFileName = `clubBg-${Date.now()}-${backgroundImg.originalname}`;
 
     await sharp(backgroundImg.buffer)
       .toFile(`Images/${newFileName}`)
       .catch((e) => {
         throw new CustomError(e.name, 400, e.message);
       });
-      let payload:any = {};
+    let payload: any = {};
 
     payload.background = newFileName;
 
@@ -184,7 +196,7 @@ export default class ClubService {
     return await Club.findAll({
       include: {
         model: User,
-        attributes: {exclude: ["password"]},
+        attributes: { exclude: ["password"] },
       },
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);

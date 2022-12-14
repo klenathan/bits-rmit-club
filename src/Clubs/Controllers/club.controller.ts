@@ -13,13 +13,17 @@ export default class ClubController {
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       let files = req.files as Express.Multer.File[];
+      // console.log(files);
+
       const payload = req.body;
-      return await this.service.create(payload, files[0]).then((result) => {
-        return res.status(200).send(result);
-      });
+      return await this.service
+        .create(payload, files[0], files[1])
+        .then((result) => {
+          return res.status(200).send(result);
+        });
     } catch (error) {
       console.log(error);
-      
+
       return next(error);
     }
   };
@@ -39,12 +43,16 @@ export default class ClubController {
     }
   };
 
-  editClubBackground = async (req: Request, res: Response, next: NextFunction) => {
+  editClubBackground = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       let clubId = req.params.id;
       let files = req.files as Express.Multer.File[];
       return await this.service
-        .changeBackground(clubId, files)
+        .changeBackground(clubId, files[0])
         .then((result) => {
           return res.send({
             message: ` Edited ${result} clubs info: ${clubId}`,
@@ -113,7 +121,7 @@ export default class ClubController {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
       // console.log("gathering");
-      
+
       return await this.service.getAllClub().then((result) => {
         return res.status(200).send(result);
       });
