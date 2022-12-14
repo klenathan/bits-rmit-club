@@ -13,13 +13,12 @@ export default class ImgRouter {
     // this.controller = new PostController(db)
     this.routes.get("/:img", async (req, res) => {
       // console.log(path.join(__dirname, "/../../Images/", req.params.img));
+      console.log(req.params.img);
+      
       res.sendFile(path.join(__dirname, "/../../Images/", req.params.img));
-
-      // res.send())
     });
     this.routes.get("/const/:img", async (req, res) => {
       res.sendFile(path.join(__dirname, "/img/", req.params.img));
-      // res.send(path.join(__dirname, '/img/', req.params.img))
     });
   }
 }

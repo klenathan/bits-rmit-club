@@ -19,20 +19,20 @@ export default class PostService {
   }
 
   authorizationCheck = async (username: string, clubId: string) => {
-    let club = await ClubUser.findAll({
+    let club = await ClubUser.findOne({
       where: { cid: clubId, username: username },
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
-    if (club.length == 0)
+    if (!club)
       throw new CustomError(
-        "UNAUTHORIZED",
-        403,
-        `${username} is not authorized to take action on club id ${clubId}`
+        "CLUB_NOT_FOUND",
+        404,
+        `${clubId} cannot be found`
       );
     // console.log(club);
-
-    if (club[0].role != "president") {
+      
+    if (club.role != "president") {
       throw new CustomError(
         "UNAUTHORIZED",
         403,
@@ -70,6 +70,8 @@ export default class PostService {
     files: Express.Multer.File[]
   ) => {
     try {
+      // console.log("generating");
+      
       payload.imgLink = [];
       for (let file of files) {
         let fileName = file.originalname;

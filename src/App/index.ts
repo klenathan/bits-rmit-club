@@ -59,6 +59,7 @@ const server = new Server(PORT, db, routerObj);
 
 db.sync({
   // force: true
+  // alter: true 
 }).then(() => {
   console.log(db.models);
   server.start();

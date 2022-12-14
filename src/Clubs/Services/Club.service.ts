@@ -26,6 +26,8 @@ export default class ClubService {
         .catch((e) => {
           throw new CustomError(e.name, 400, e.message);
         });
+        console.log("New Club Ava: ", avatar.originalname);
+        
       payload.avatar = newFileName;
       let newClub = await Club.create(payload, { include: User }).catch((e) => {
         throw new CustomError(e.name, 400, e.message);
@@ -34,6 +36,7 @@ export default class ClubService {
       await newClub.$add("member", presidentUser, {
         through: {
           role: "president",
+          status: "active"
         },
       });
       return newClub;
@@ -64,6 +67,28 @@ export default class ClubService {
   };
 
   editClubInfo = async (clubId: string, payload: Partial<Club>) => {
+
+    return await Club.update(payload, {
+      where: { clubid: clubId },
+    }).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+  };
+
+  changeBackground = async (clubId: string, files: Express.Multer.File[]) => {
+    let backgroundImg = files[0];
+
+    const newFileName = `clubAva-${Date.now()}-${backgroundImg.originalname}`;
+
+    await sharp(backgroundImg.buffer)
+      .toFile(`Images/${newFileName}`)
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+      let payload:any = {};
+
+    payload.background = newFileName;
+
     return await Club.update(payload, {
       where: { clubid: clubId },
     }).catch((e) => {

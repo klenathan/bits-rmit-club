@@ -94,7 +94,7 @@ export default class PostController {
           )
         );
       }
-      // await this.service.authorizationCheck(req.body.user, req.body.author);
+      
       return await this.service.updatePost(id, req.body).then(r => {
         return res.status(200).send({result: `updated ${r} post`});
       });
