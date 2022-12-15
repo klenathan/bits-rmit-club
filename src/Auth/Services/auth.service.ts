@@ -111,7 +111,6 @@ export default class AuthService extends BaseService<User> {
         .update(password)
         .digest("hex");
       payload.password = hashPassword;
-      
 
       let randomToken = (Math.random() + 1)
         .toString(36)
@@ -140,7 +139,7 @@ export default class AuthService extends BaseService<User> {
         .catch((e) => {
           throw new CustomError(e.name, 400, e.message);
         });
-        payload.avatar = newFileName
+      payload.avatar = newFileName;
 
       return await User.create(payload).catch((e) => {
         if (e.name == "SequelizeUniqueConstraintError") {
@@ -174,5 +173,20 @@ export default class AuthService extends BaseService<User> {
     }
 
     return result;
+  };
+
+  updateAvatar = async (file: Express.Multer.File): Promise<string> => {
+    const newFileName = `avatar-${Date.now()}-${file.originalname}`;
+
+    return await sharp(file.buffer)
+      .toFile(`Images/${newFileName}`)
+      .then(r => {
+        return newFileName;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    
   };
 }
