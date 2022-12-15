@@ -3,14 +3,11 @@ import {
   Table,
   Column,
   Model,
-  HasMany,
   DataType,
   PrimaryKey,
-  AllowNull,
   Default,
   ForeignKey,
   BelongsToMany,
-  HasOne
 } from "sequelize-typescript";
 import { User } from "../../Auth/Models/User.model";
 import { ClubUser } from "./ClubUser.model";
@@ -38,6 +35,10 @@ export class Club extends Model {
   @ForeignKey(() => User)
   @Column
   declare president: string;
+
+  @Default("pending")
+  @Column(DataType.ENUM('pending', 'active', 'banned'))
+  declare status: string
 
   @BelongsToMany(() => User, () => ClubUser)
   member!: User[];

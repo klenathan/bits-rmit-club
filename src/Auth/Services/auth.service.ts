@@ -125,7 +125,7 @@ export default class AuthService extends BaseService<User> {
           if (!payload.email) {
             throw new CustomError("INVALID_EMAIL", 400, "Invalid input email");
           }
-          new MailService().sendVerificationMail(payload.email, randomToken);
+          // new MailService().sendVerificationMail(payload.email, randomToken);
         })
         .catch((e) => {
           if (e.name == "SequelizeUniqueConstraintError") {

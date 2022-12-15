@@ -57,7 +57,7 @@ export default class ClubService {
       throw new CustomError(
         "USER_NOT_FOUND",
         404,
-        `${payload.president} cannot be found`
+        `user ${payload.president} cannot be found`
       );
     }
   };

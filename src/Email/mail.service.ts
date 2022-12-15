@@ -2,6 +2,7 @@ import * as nodemailer from "nodemailer";
 import path from "path";
 import sharp from "sharp";
 import CustomError from "../App/Middlewares/Errors/CustomError";
+import confirmationEmailTemplate from './emailTemplate'
 
 export default class MailService {
   sendMail = async (userEmail: string) => {
@@ -64,26 +65,26 @@ export default class MailService {
     //   console.log(sharpIMG);
     //   console.log(path.join(__dirname, 'logo_trans.png'));
 
-    var content = "";
-    content += `
-                          <div style="padding: 10px; background-color: #003375">
-                              <div style="margin: 0 auto; padding: 10px; background-color: white;">
-                                <img style="width: 200px; height: 200px; object-fit: cover" src="https://dcmp4zikxcg13.cloudfront.net/TuanVutru.png">
-                                  <h2 style="color: #0085ff">RMIT ClubHub Account verification</h2>
-                                  <p> 
-                                    Dear <b>${userEmail.split("@")[0]}</b>, <br>
-                                    Please verify your email address to complete your RMIT ClubHub account. <br>
-                                    Your verification code is: <b>${code}</b> <br>
+    var content = confirmationEmailTemplate(code);
+    // content += `
+    //                       <div style="padding: 10px; background-color: #003375">
+    //                           <div style="margin: 0 auto; padding: 10px; background-color: white;">
+    //                             <img style="width: 200px; height: 200px; object-fit: cover" src="https://dcmp4zikxcg13.cloudfront.net/TuanVutru.png">
+    //                               <h2 style="color: #0085ff">RMIT ClubHub Account verification</h2>
+    //                               <p> 
+    //                                 Dear <b>${userEmail.split("@")[0]}</b>, <br>
+    //                                 Please verify your email address to complete your RMIT ClubHub account. <br>
+    //                                 Your verification code is: <b>${code}</b> <br>
 
-                                    Thank you, <br>
-                                    The RMIT ClubHub Team
-                                    </p>
-                              </div>
-                          </div>
-                      `;
+    //                                 Thank you, <br>
+    //                                 The RMIT ClubHub Team
+    //                                 </p>
+    //                           </div>
+    //                       </div>
+    //                   `;
     var mainOptions = {
       from: "RMIT CLUB APP",
-      to: "aasd@maisl.casca", //userEmail,
+      to: "userEmail@asd.as", //userEmail,
       subject: `RMIT ClubHub Account verification for ${
         userEmail.split("@")[0]
       }`,
