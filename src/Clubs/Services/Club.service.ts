@@ -88,8 +88,6 @@ export default class ClubService {
   };
 
   changeBackground = async (clubId: string, backgroundImg: Express.Multer.File) => {
-    // let backgroundImg = file;
-
     const newFileName = `clubBg-${Date.now()}-${backgroundImg.originalname}`;
 
     await sharp(backgroundImg.buffer)

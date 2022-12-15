@@ -407,10 +407,13 @@ export default class PostService {
   getAllEvent = async (username: string) => {
     let userClubs = await User.findByPk(username, {include: [Club]})
     userClubs?.member.forEach(club => {
-      console.log(club.name);
+      console.log(club.clubid);
     })
 
     let clubArr = userClubs?.member.map(club => club.clubid)
+
+    // console.log(clubArr);
+    
     
     let events = await ClubEvent.findAll({
       where: { startDate: { [Op.gte]: Date()},  author: clubArr  },

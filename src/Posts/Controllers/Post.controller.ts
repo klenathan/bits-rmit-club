@@ -170,6 +170,8 @@ export default class PostController {
       );
     }
     let username = req.query.user as string;
+    
+    
     try {
       return await this.service.getAllEvent(username).then((r) => {
         return res.status(200).send(r);
