@@ -58,7 +58,7 @@ const routerObj: Irouter = {
 const server = new Server(PORT, db, routerObj);
 
 db.sync({
-  force: true
+  // force: true
   // alter: true 
 }).then(() => {
   console.log(db.models);

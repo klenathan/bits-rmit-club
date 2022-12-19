@@ -7,8 +7,8 @@ import time
 
 from faker import Faker
 
-
-base_url = "http://localhost:8080"
+base_url = "http://13.212.85.228:8080"
+# base_url = "http://localhost:8080"
 simple_password = "123456"
 
 club_data = {
@@ -64,10 +64,52 @@ def add_admin():
         "isAdmin": (None, True),
         'avatar': ('3.jpg', open('./Images/random/3.jpg', 'rb'))
     }
+
+    channam = {
+        "username": (None, 'channam'),
+        "password": (None, 'admin'),
+        "email": (None, 's3000000@rmit.edu.vn'),
+        "firstName": (None, 'Chan Nam'),
+        "lastName": (None, 'Tran'),
+        "isAdmin": (None, True),
+        'avatar': ('channam.jpg', open('./Images/random/channam.jpg', 'rb'))
+    }
+
+    tuanle = {
+        "username": (None, 'tuanle'),
+        "password": (None, 'admin'),
+        "email": (None, 's3000000@rmit.edu.vn'),
+        "firstName": (None, 'Anh Tuan'),
+        "lastName": (None, 'Le'),
+        "isAdmin": (None, True),
+        'avatar': ('tuanle.jpg', open('./Images/random/tuanle.jpg', 'rb'))
+    }
+
+    namthai = {
+        "username": (None, 'namthai'),
+        "password": (None, 'admin'),
+        "email": (None, 's3000000@rmit.edu.vn'),
+        "firstName": (None, 'Nam Thai'),
+        "lastName": (None, 'Tran'),
+        "isAdmin": (None, True),
+        'avatar': ('namthai.jpg', open('./Images/random/namthai.jpg', 'rb'))
+    }
     # print(user_data)
-    response = requests.post(base_url + "/auth/signup", files=user_data)
-    print("\nADMIN RESULT: ")
-    print(response.json())
+    response0 = requests.post(base_url + "/auth/signup", files=user_data)
+    print("\nADMIN 1 RESULT: ")
+    print(response0.json())
+
+    response1 = requests.post(base_url + "/auth/signup", files=namthai)
+    print("\nADMIN 1 RESULT: ")
+    print(response1.json())
+
+    response2 = requests.post(base_url + "/auth/signup", files=tuanle)
+    print("\nADMIN 2 RESULT: ")
+    print(response2.json())
+
+    response3 = requests.post(base_url + "/auth/signup", files=channam)
+    print("\nADMIN 3 RESULT: ")
+    print(response3.json())
 
 
 fake_people = []
@@ -128,7 +170,7 @@ def addMemberToClub():
             "clubId": i,
             "users": []
         }
-        for j in range(20):
+        for j in range(15):
             new_mem = random.choice(fake_people)
             if ({
                 'username': new_mem['username'],
@@ -146,10 +188,31 @@ def addMemberToClub():
         print(response.json())
 
 
+def addEvents(count):
+    for i in range(count):
+        payload = {'name': f'Dummy events {i}',
+                'startDate': '2023-12-14T00:00:00.511Z',
+                'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce euismod orci a nulla condimentum, ut tincidunt ante posuere. Etiam nec nisl eget turpis laoreet pharetra eu ut risus. Nam maximus mollis ultrices.',
+                'author': 'rmitmassmedia',
+                'user': 'admin'}
+        files = [
+            ('img', ('leaves.jpg',
+            open('/Users/nathantran/Downloads/pexels-cátia-matos-1072179.jpg', 'rb'), 'image/jpeg'))
+        ]
+        headers = {}
+
+        response = requests.request(
+            "POST", base_url + "/post/event", headers=headers, data=payload, files=files)
+
+        print(response.text)
+
+
 if __name__ == "__main__":
     add_admin()
+    
     addClub()
-    generate_users(50)
+    generate_users(30)
     print("done users")
-    time.sleep(2)
+    # time.sleep(2)
     addMemberToClub()
+    addEvents(5)
