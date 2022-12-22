@@ -25,13 +25,9 @@ export default class PostService {
       throw new CustomError(e.name, 400, e.message);
     });
     if (!club)
-      throw new CustomError(
-        "CLUB_NOT_FOUND",
-        404,
-        `${clubId} cannot be found`
-      );
+      throw new CustomError("CLUB_NOT_FOUND", 404, `${clubId} cannot be found`);
     // console.log(club);
-      
+
     if (club.role != "president") {
       throw new CustomError(
         "UNAUTHORIZED",
@@ -71,7 +67,7 @@ export default class PostService {
   ) => {
     try {
       // console.log("generating");
-      
+
       payload.imgLink = [];
       for (let file of files) {
         let fileName = file.originalname;
@@ -119,12 +115,12 @@ export default class PostService {
   updatePost = async (id: string, payload: Partial<Post>) => {
     try {
       console.log(id);
-      let result = await Post.update(payload, {where: {id: id}})
+      let result = await Post.update(payload, { where: { id: id } });
       return result;
     } catch (e: any) {
-      throw new CustomError(e.name, 400, e.message)
+      throw new CustomError(e.name, 400, e.message);
     }
-  }
+  };
 
   // LikePost
   likePost = async (postID: string, userID: string) => {
@@ -405,18 +401,17 @@ export default class PostService {
   };
 
   getAllEvent = async (username: string) => {
-    let userClubs = await User.findByPk(username, {include: [Club]})
-    userClubs?.member.forEach(club => {
+    let userClubs = await User.findByPk(username, { include: [Club] });
+    userClubs?.member.forEach((club) => {
       console.log(club.clubid);
-    })
+    });
 
-    let clubArr = userClubs?.member.map(club => club.clubid)
+    let clubArr = userClubs?.member.map((club) => club.clubid);
 
     // console.log(clubArr);
-    
-    
+
     let events = await ClubEvent.findAll({
-      where: { startDate: { [Op.gte]: Date()},  author: clubArr  },
+      where: { startDate: { [Op.gte]: Date() }, author: clubArr },
       include: Club,
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);

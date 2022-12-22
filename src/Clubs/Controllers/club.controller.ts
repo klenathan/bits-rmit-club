@@ -108,6 +108,35 @@ export default class ClubController {
     }
   };
 
+  removeMember = async (req: Request, res: Response, next: NextFunction) => {
+    console.log(req.body);
+    try {
+      const clubID = req.body.clubId;
+      const userArr = req.body.users;
+
+      return await this.service.removeMember(clubID, userArr).then((result) => {
+        return res
+          .status(200)
+          .send({ message: `Deleted ${result} members from club ${clubID}` });
+      });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  editUserRole = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const clubID = req.body.clubId;
+      const user = req.body.user;
+      const role: string = req.body.role;
+      return await this.service.editUserRole(clubID, user, role).then((r) => {
+        return res.status(200).send(r);
+      });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
   getClubInfo = async (req: Request, res: Response, next: NextFunction) => {
     try {
       return await this.service.getClubInfo(req.params.id).then((result) => {
@@ -120,8 +149,6 @@ export default class ClubController {
 
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // console.log("gathering");
-
       return await this.service.getAllClub().then((result) => {
         return res.status(200).send(result);
       });

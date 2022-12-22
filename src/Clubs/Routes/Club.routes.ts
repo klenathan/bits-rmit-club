@@ -14,11 +14,13 @@ export default class ClubRouter {
     this.routes
       .get("/", this.controller.getAll)
       .post("/", upload.any(), this.controller.create)
-      .post("/request/:id", upload.any(),this.controller.requestClub)
+      .post("/request/:id", upload.any(), this.controller.requestClub)
       .post("/member", this.controller.addNewMember)
-      .put("/background/:id", upload.any(),this.controller.editClubBackground)
-      .put("/edit/:id", this.controller.editClubInfo)
+      .put("/member", this.controller.editUserRole)
+      .delete("/member", this.controller.removeMember)
+      .put("/background/:id", upload.any(), this.controller.editClubBackground)
+      .put("/edit/:id", upload.any(), this.controller.editClubInfo)
       .put("/promote/:id", this.controller.promoteToPresident)
-      .get("/:id", this.controller.getClubInfo)
+      .get("/:id", this.controller.getClubInfo);
   }
 }

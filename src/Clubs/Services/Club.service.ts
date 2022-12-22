@@ -6,6 +6,7 @@ import { ClubUser } from "../Models/ClubUser.model";
 import NotFoundError from "../../App/Middlewares/Errors/NotFoundError";
 import { NewNotiUtil } from "../../Base/Utils/notiEvent";
 import sharp from "sharp";
+import { Op } from "sequelize";
 
 export default class ClubService {
   declare db: Sequelize;
@@ -87,7 +88,10 @@ export default class ClubService {
     });
   };
 
-  changeBackground = async (clubId: string, backgroundImg: Express.Multer.File) => {
+  changeBackground = async (
+    clubId: string,
+    backgroundImg: Express.Multer.File
+  ) => {
     const newFileName = `clubBg-${Date.now()}-${backgroundImg.originalname}`;
 
     await sharp(backgroundImg.buffer)
@@ -147,6 +151,40 @@ export default class ClubService {
         status: "pending",
       },
     });
+  };
+
+  removeMember = async (id: string, userArr: string[]) => {
+    let clubUserQuery = await ClubUser.findAll({
+      where: { username: { [Op.in]: userArr }, cid: id },
+    });
+
+    if (clubUserQuery.length != userArr.length) {
+      throw new NotFoundError("USER_NOT_FOUND", "Some user cannot be found");
+    }
+
+    let deleteResult = await ClubUser.destroy({
+      where: { username: { [Op.in]: userArr }, cid: id },
+    }).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+    return deleteResult;
+  };
+
+  editUserRole = async (id: string, user: string, role: string) => {
+    let result = await ClubUser.update(
+      { role: role },
+      {
+        where: { username: user, cid: id },
+      }
+    ).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+
+    return await ClubUser.findOne({ where: { username: user, cid: id } }).catch(
+      (e) => {
+        throw new CustomError(e.name, 400, e.message);
+      }
+    );
   };
 
   addClubMember = async (
