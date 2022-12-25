@@ -5,6 +5,7 @@ import { Club } from "../Models/Club.model";
 import { ClubUser } from "../Models/ClubUser.model";
 import NotFoundError from "../../App/Middlewares/Errors/NotFoundError";
 import { NewNotiUtil } from "../../Base/Utils/notiEvent";
+import { RequestNewClubDTO } from "../DTOs/RequestNewClubDTO";
 import sharp from "sharp";
 import { Op } from "sequelize";
 
@@ -42,6 +43,8 @@ export default class ClubService {
         });
 
       payload.background = newBgName;
+
+      payload.status = "active";
 
       let newClub = await Club.create(payload, { include: User }).catch((e) => {
         throw new CustomError(e.name, 400, e.message);
@@ -81,6 +84,28 @@ export default class ClubService {
   };
 
   editClubInfo = async (clubId: string, payload: Partial<Club>) => {
+    await Club.findByPk(clubId)
+      .then((r) => {
+        if (!r) {
+          throw new NotFoundError(
+            "CLUB_NOT_FOUND",
+            `${clubId} cannot be found`
+          );
+        }
+
+        if (r.status != "active") {
+          throw new CustomError(
+            "UNAVAILABLE_CLUB",
+            400,
+            `${clubId} is in pending status or has been banned`
+          );
+        }
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+
     return await Club.update(payload, {
       where: { clubid: clubId },
     }).catch((e) => {
@@ -111,6 +136,27 @@ export default class ClubService {
   };
 
   requestClub = async (username: string, clubId: string) => {
+    await Club.findByPk(clubId)
+      .then((r) => {
+        if (!r) {
+          throw new NotFoundError(
+            "CLUB_NOT_FOUND",
+            `${clubId} cannot be found`
+          );
+        }
+
+        if (r.status != "active") {
+          throw new CustomError(
+            "UNAVAILABLE_CLUB",
+            400,
+            `${clubId} is in pending status or has been banned`
+          );
+        }
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
     let current = await ClubUser.findOne({
       where: { username: username, cid: clubId },
     })
@@ -203,9 +249,27 @@ export default class ClubService {
       throw new CustomError(e.name, 400, e.message);
     });
 
-    const club = await Club.findByPk(clubID).catch((e) => {
-      throw new CustomError(e.name, 400, e.message);
-    });
+    const club = await Club.findByPk(clubID)
+      .then((r) => {
+        if (!r) {
+          throw new NotFoundError(
+            "CLUB_NOT_FOUND",
+            `${clubID} cannot be found`
+          );
+        }
+
+        if (r.status != "active") {
+          throw new CustomError(
+            "UNAVAILABLE_CLUB",
+            400,
+            `${clubID} is in pending status or has been banned`
+          );
+        }
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
 
     if (users.length != userArr.length) {
       throw new CustomError(
@@ -341,4 +405,72 @@ export default class ClubService {
       club.avatar
     );
   };
+
+  newClub = async (
+    payload: RequestNewClubDTO,
+    avatar: Express.Multer.File,
+    bg: Express.Multer.File
+  ) => {
+    //// Get president/requester information
+    let president = await User.findByPk(payload.user, { include: [Club] })
+      .then((r) => {
+        r?.member.forEach((club) => {
+          if (club.president == payload.user) {
+            throw new CustomError(
+              "USER_ALREADY_PRESIDENT",
+              400,
+              `${payload.user} has already been a president for club ${club.name}`
+            );
+          }
+        });
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    if (!president) {
+      throw new NotFoundError(
+        "USER_NOT_FOUND",
+        `${payload.user} cannot be found`
+      );
+    }
+
+    //// Upload image
+
+    payload.avatar = await this.handleImageUpload(avatar, "clubAva");
+    payload.background = await this.handleImageUpload(bg, "clubBg");
+
+    //// Create club request
+    let club = await Club.create(payload)
+      .then((r) => {
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    return club;
+  };
+
+  getAllClubRequest = async () => {
+    let result = await Club.findAll({ where: { status: "pending" } });
+    return result
+  };
+
+  handleImageUpload = async (
+    file: Express.Multer.File,
+    prefix: string
+  ): Promise<string> => {
+    const newFileName = `${prefix}-${Date.now()}-${file.originalname}`;
+
+    await sharp(file.buffer)
+      .toFile(`Images/${newFileName}`)
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+    return newFileName;
+  };
+
+  
 }

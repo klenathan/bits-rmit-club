@@ -60,12 +60,28 @@ export default class MailService {
       },
     });
 
-    //   <span style="color: black">Đây là mail test</span>
-    //   let sharpIMG = await sharp(path.join(__dirname, 'TuanVutru.png')).toBuffer()
-    //   console.log(sharpIMG);
-    //   console.log(path.join(__dirname, 'logo_trans.png'));
-
     var content = confirmationEmailTemplate(code);
+    var mainOptions = {
+      from: "RMIT CLUB APP",
+      to: userEmail, //userEmail,
+      subject: `RMIT ClubHub Account verification for ${
+        userEmail.split("@")[0]
+      }`,
+      text: "txt",
+      html: content,
+    };
+    transporter.sendMail(mainOptions, function (err, info) {
+      if (err) {
+        throw new CustomError(err.name, 400, err.message);
+      } else {
+        return { message: "An email is sent to" + userEmail };
+      }
+    });
+  };
+}
+
+
+
     // content += `
     //                       <div style="padding: 10px; background-color: #003375">
     //                           <div style="margin: 0 auto; padding: 10px; background-color: white;">
@@ -82,21 +98,3 @@ export default class MailService {
     //                           </div>
     //                       </div>
     //                   `;
-    var mainOptions = {
-      from: "RMIT CLUB APP",
-      to: "userEmail@asd.as", //userEmail,
-      subject: `RMIT ClubHub Account verification for ${
-        userEmail.split("@")[0]
-      }`,
-      text: "txt",
-      html: content,
-    };
-    transporter.sendMail(mainOptions, function (err, info) {
-      if (err) {
-        throw new CustomError(err.name, 400, err.message);
-      } else {
-        return { message: "An email is sent to" + userEmail };
-      }
-    });
-  };
-}

@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import { Sequelize } from "sequelize-typescript";
 import ClubService from "../Services/Club.service";
 
+import { RequestNewClubDTO } from "../DTOs/RequestNewClubDTO";
+
 export default class ClubController {
   declare db: Sequelize;
   declare service: ClubService;
@@ -152,6 +154,32 @@ export default class ClubController {
       return await this.service.getAllClub().then((result) => {
         return res.status(200).send(result);
       });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  newClub = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let payload: RequestNewClubDTO = req.body;
+      let files = req.files as Express.Multer.File[];
+      return await this.service
+        .newClub(payload, files[0], files[1])
+        .then((result) => {
+          return res.status(200).send(result);
+        });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  getAllClubRequest = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return await this.service
+        .getAllClubRequest()
+        .then((result) => {
+          return res.status(200).send(result);
+        });
     } catch (e) {
       return next(e);
     }
