@@ -4,5 +4,6 @@ export type RequestNewClubDTO = {
     desc?: string;
     avatar?: string;
     background?: string;
-    user: string;
+    user: string; // requester
+    president?: string;
 }

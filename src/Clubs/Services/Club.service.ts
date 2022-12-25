@@ -8,12 +8,18 @@ import { NewNotiUtil } from "../../Base/Utils/notiEvent";
 import { RequestNewClubDTO } from "../DTOs/RequestNewClubDTO";
 import sharp from "sharp";
 import { Op } from "sequelize";
+import * as Banning from "./Banning.service"
 
 export default class ClubService {
   declare db: Sequelize;
   constructor(db: Sequelize) {
     this.db = db;
   }
+
+  // Banning Club member
+
+  banMember = Banning.banMember
+  unbanMember = Banning.unbanMember
 
   create = async (
     payload: Partial<Club>,
@@ -440,10 +446,13 @@ export default class ClubService {
 
     payload.avatar = await this.handleImageUpload(avatar, "clubAva");
     payload.background = await this.handleImageUpload(bg, "clubBg");
+    payload.president = president.username
 
     //// Create club request
     let club = await Club.create(payload)
       .then((r) => {
+        console.log(r);
+        
         return r;
       })
       .catch((e) => {
@@ -471,6 +480,7 @@ export default class ClubService {
       });
     return newFileName;
   };
+
 
   
 }

@@ -20,6 +20,8 @@ export default class ClubRouter {
       .post("/member", this.controller.addNewMember)
       .put("/member", this.controller.editUserRole)
       .delete("/member", this.controller.removeMember)
+      .post("/ban", this.controller.banMember)
+      .post("/unban", this.controller.unbanMember)
       .put("/background/:id", upload.any(), this.controller.editClubBackground)
       .put("/edit/:id", upload.any(), this.controller.editClubInfo)
       .put("/promote/:id", this.controller.promoteToPresident)

@@ -20,6 +20,8 @@ export default class AuthRouter {
       .get("/", this.controller.getAllUser)
       .post("/verify", this.controller.validateUser)
       .post("/signup", upload.any(), this.controller.signUp)
+      .post("/ban", this.controller.banUser)
+      .post("/unban", this.controller.unbanUser)
       .put("/:username", upload.any(), this.controller.updateUser)
       .get("/:id", this.controller.getUserInfo);
   }

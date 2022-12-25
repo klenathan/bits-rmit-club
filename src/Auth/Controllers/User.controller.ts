@@ -109,4 +109,29 @@ export default class AuthController {
       return next(error);
     }
   };
+
+  banUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return await this.services
+        .banUser(req.body.username, req.body.user)
+        .then((result) => {
+          return res.send(result);
+        });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  unbanUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return await this.services
+        .unbanUser(req.body.username, req.body.user)
+        .then((result) => {
+          return res.send(result);
+        });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
 }

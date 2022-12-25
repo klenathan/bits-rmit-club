@@ -3,6 +3,7 @@ import { Sequelize } from "sequelize-typescript";
 import ClubService from "../Services/Club.service";
 
 import { RequestNewClubDTO } from "../DTOs/RequestNewClubDTO";
+import CustomError from "../../App/Middlewares/Errors/CustomError";
 
 export default class ClubController {
   declare db: Sequelize;
@@ -173,10 +174,54 @@ export default class ClubController {
     }
   };
 
-  getAllClubRequest = async (req: Request, res: Response, next: NextFunction) => {
+  getAllClubRequest = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      return await this.service.getAllClubRequest().then((result) => {
+        return res.status(200).send(result);
+      });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  banMember = async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.body.username || !req.body.clubID || !req.body.requester) {
+      return next(
+        new CustomError(
+          "INVALID_INPUT",
+          400,
+          "Request must include username, clubID and requester"
+        )
+      );
+    }
     try {
       return await this.service
-        .getAllClubRequest()
+        .banMember(req.body.username, req.body.clubID, req.body.requester)
+        .then((result) => {
+          return res.status(200).send(result);
+        });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  unbanMember = async (req: Request, res: Response, next: NextFunction) => {
+    if (!req.body.username || !req.body.clubID || !req.body.requester) {
+      return next(
+        new CustomError(
+          "INVALID_INPUT",
+          400,
+          "Request must include username, clubID and requester"
+        )
+      );
+    }
+    try {
+      return await this.service
+        .unbanMember(req.body.username, req.body.clubID, req.body.requester)
         .then((result) => {
           return res.status(200).send(result);
         });

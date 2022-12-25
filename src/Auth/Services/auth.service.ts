@@ -125,7 +125,7 @@ export default class AuthService extends BaseService<User> {
           if (!payload.email) {
             throw new CustomError("INVALID_EMAIL", 400, "Invalid input email");
           }
-          // new MailService().sendVerificationMail(payload.email, randomToken);
+          new MailService().sendVerificationMail(payload.email, randomToken);
         })
         .catch((e) => {
           if (e.name == "SequelizeUniqueConstraintError") {
@@ -180,13 +180,87 @@ export default class AuthService extends BaseService<User> {
 
     return await sharp(file.buffer)
       .toFile(`Images/${newFileName}`)
-      .then(r => {
+      .then((r) => {
         return newFileName;
       })
       .catch((e) => {
         throw new CustomError(e.name, 400, e.message);
       });
+  };
 
-    
+  banUser = async (username: string, requesterUsername: string) => {
+    let requester = await User.findByPk(requesterUsername)
+      .then((r) => {
+        if (!r?.isAdmin) {
+          throw new CustomError(
+            "UNAUTHORIZED",
+            403,
+            "User is not authorized for this task"
+          );
+        }
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    let user = await User.findByPk(username)
+      .then((r) => {
+        console.log(r?.status);
+
+        if (r?.status == "banned")
+          throw new CustomError(
+            "BANNED_USER",
+            400,
+            `${username} has already been banned`
+          );
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    if (!user)
+      throw new NotFoundError(`USER_NOT_FOUND`, `${user} cannot be found`);
+
+    user.update({ status: "banned" });
+    user.save();
+    return user;
+  };
+
+  unbanUser = async (username: string, requesterUsername: string) => {
+    let requester = await User.findByPk(requesterUsername)
+      .then((r) => {
+        if (!r?.isAdmin) {
+          throw new CustomError(
+            "UNAUTHORIZED",
+            403,
+            "User is not authorized for this task"
+          );
+        }
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+    let user = await User.findByPk(username)
+      .then((r) => {
+        if (r?.status != "banned")
+          throw new CustomError(
+            "NOT_BANNED_USER",
+            400,
+            `${username} is not banned`
+          );
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+    if (!user)
+      throw new NotFoundError(`USER_NOT_FOUND`, `${user} cannot be found`);
+    user.update({ status: "active" });
+    user.save();
+
+    return user;
   };
 }
