@@ -15,13 +15,18 @@ export default class ClubRouter {
       .get("/", this.controller.getAll)
       .post("/", upload.any(), this.controller.create)
       .get("/newclub",this.controller.getAllClubRequest)
+      //// New Club
       .post("/newclub", upload.any(), this.controller.newClub)
+      .post("/acceptnewclub", upload.any(), this.controller.acceptNewClub)
+      .post("/rejectnewclub", upload.any(), this.controller.rejectNewClub)
+      /// Member related
       .post("/request/:id", upload.any(), this.controller.requestClub)
       .post("/member", this.controller.addNewMember)
       .put("/member", this.controller.editUserRole)
       .delete("/member", this.controller.removeMember)
       .post("/ban", this.controller.banMember)
       .post("/unban", this.controller.unbanMember)
+      // Club data edit
       .put("/background/:id", upload.any(), this.controller.editClubBackground)
       .put("/edit/:id", upload.any(), this.controller.editClubInfo)
       .put("/promote/:id", this.controller.promoteToPresident)

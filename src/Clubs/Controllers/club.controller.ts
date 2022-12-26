@@ -197,6 +197,30 @@ export default class ClubController {
     }
   };
 
+  acceptNewClub = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let requester = req.body.user;
+      let clubID = req.body.clubID;
+      return this.service.acceptNewClub(requester, clubID).then((r) => {
+        return res.status(200).send(r);
+      });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  rejectNewClub = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let requester = req.body.user;
+      let clubID = req.body.clubID;
+      return this.service.rejectNewClub(requester, clubID).then((r) => {
+        return res.status(200).send(r);
+      });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
   banMember = async (req: Request, res: Response, next: NextFunction) => {
     if (!req.body.username || !req.body.clubID || !req.body.requester) {
       return next(

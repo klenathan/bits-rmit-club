@@ -8,7 +8,7 @@ import { NewNotiUtil } from "../../Base/Utils/notiEvent";
 import { RequestNewClubDTO } from "../DTOs/RequestNewClubDTO";
 import sharp from "sharp";
 import { Op } from "sequelize";
-import * as Banning from "./Banning.service"
+import * as Banning from "./Banning.service";
 
 export default class ClubService {
   declare db: Sequelize;
@@ -18,8 +18,8 @@ export default class ClubService {
 
   // Banning Club member
 
-  banMember = Banning.banMember
-  unbanMember = Banning.unbanMember
+  banMember = Banning.banMember;
+  unbanMember = Banning.unbanMember;
 
   create = async (
     payload: Partial<Club>,
@@ -446,13 +446,13 @@ export default class ClubService {
 
     payload.avatar = await this.handleImageUpload(avatar, "clubAva");
     payload.background = await this.handleImageUpload(bg, "clubBg");
-    payload.president = president.username
+    payload.president = president.username;
 
     //// Create club request
     let club = await Club.create(payload)
       .then((r) => {
         console.log(r);
-        
+
         return r;
       })
       .catch((e) => {
@@ -464,7 +464,7 @@ export default class ClubService {
 
   getAllClubRequest = async () => {
     let result = await Club.findAll({ where: { status: "pending" } });
-    return result
+    return result;
   };
 
   handleImageUpload = async (
@@ -481,6 +481,73 @@ export default class ClubService {
     return newFileName;
   };
 
+  acceptNewClub = async (requester: string, clubID: string) => {
+    let user = await User.findByPk(requester)
+      .then((r) => {
+        if (!r?.isAdmin) {
+          throw new CustomError(
+            "UNAUTHORIZED",
+            403,
+            `${requester} is not authorized for this task`
+          );
+        }
+        return r?.isAdmin;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
 
-  
+    let club = await Club.findByPk(clubID)
+      .then((r) => {
+        if (r?.status != "pending")
+          throw new CustomError(
+            "INVALID_CLUB_STATUS",
+            400,
+            `${clubID}'s not in pending status`
+          );
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    club.update({ status: "active" });
+    club.save();
+    return club
+  };
+
+  rejectNewClub = async (requester: string, clubID: string) => {
+    let user = await User.findByPk(requester)
+      .then((r) => {
+        if (!r?.isAdmin) {
+          throw new CustomError(
+            "UNAUTHORIZED",
+            403,
+            `${requester} is not authorized for this task`
+          );
+        }
+        return r?.isAdmin;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    let club = await Club.findByPk(clubID)
+      .then((r) => {
+        if (r?.status != "pending")
+          throw new CustomError(
+            "INVALID_CLUB_STATUS",
+            400,
+            `${clubID}'s not in pending status`
+          );
+        return r;
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    club.destroy();
+    club.save();
+    return {success: `Rejected club ${clubID}`}
+  };
 }
