@@ -163,7 +163,7 @@ export default class ClubController {
   newClub = async (req: Request, res: Response, next: NextFunction) => {
     try {
       let payload: RequestNewClubDTO = req.body;
-      if (!payload.user || !payload.name || !payload.clubID) {
+      if (!payload.user || !payload.name || !payload.clubid) {
         return next(
           new CustomError(
             "MISSING_FIELDS",

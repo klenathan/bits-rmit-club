@@ -1,5 +1,5 @@
 export type RequestNewClubDTO = {
-    clubID: string;
+    clubid: string;
     name: string;
     desc?: string;
     avatar?: string;
