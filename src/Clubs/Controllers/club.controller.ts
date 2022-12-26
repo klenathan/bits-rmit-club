@@ -201,7 +201,7 @@ export default class ClubController {
     try {
       let requester = req.body.user;
       let clubID = req.body.clubID;
-      return this.service.acceptNewClub(requester, clubID).then((r) => {
+      return await this.service.acceptNewClub(requester, clubID).then((r) => {
         return res.status(200).send(r);
       });
     } catch (e) {
@@ -213,7 +213,7 @@ export default class ClubController {
     try {
       let requester = req.body.user;
       let clubID = req.body.clubID;
-      return this.service.rejectNewClub(requester, clubID).then((r) => {
+      return await  this.service.rejectNewClub(requester, clubID).then((r) => {
         return res.status(200).send(r);
       });
     } catch (e) {
