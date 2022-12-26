@@ -163,6 +163,15 @@ export default class ClubController {
   newClub = async (req: Request, res: Response, next: NextFunction) => {
     try {
       let payload: RequestNewClubDTO = req.body;
+      if (!payload.user || !payload.name || !payload.clubID) {
+        return next(
+          new CustomError(
+            "MISSING_FIELDS",
+            400,
+            "Please include requester, club name and clubID in payload"
+          )
+        );
+      }
       let files = req.files as Express.Multer.File[];
       return await this.service
         .newClub(payload, files[0], files[1])
