@@ -19,10 +19,10 @@ export default class AuthRouter {
       .post("/login", this.controller.login)
       .get("/", this.controller.getAllUser)
       .post("/verify", this.controller.validateUser)
-      .post("/signup", upload.any(), this.controller.signUp)
+      .post("/signup", this.controller.signUp)
       .post("/ban", this.controller.banUser)
       .post("/unban", this.controller.unbanUser)
-      .put("/:username", upload.any(), this.controller.updateUser)
+      .put("/:username", this.controller.updateUser)
       .get("/:id", this.controller.getUserInfo);
   }
 }

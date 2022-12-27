@@ -18,11 +18,11 @@ export default class PostRouter {
 
     this.routes
       .get("/", this.controller.getAllPost)
-      .post("/event", upload.any(), this.controller.createNewEvent)
+      .post("/event", this.controller.createNewEvent)
       .get("/event", this.controller.getAllEvent)
       .put("/event/:id", this.controller.updateEvent)
-      .post("/", upload.any(), this.controller.create)
-      .put("/update/:id", upload.any(), this.controller.updatePost)
+      .post("/", this.controller.create)
+      .put("/update/:id", this.controller.updatePost)
       .post("/like/:pid", this.controller.likePost)
       .post("/comment/:pid", this.controller.createComment)
       .delete("/removelike/:pid", this.controller.removeLikePost)

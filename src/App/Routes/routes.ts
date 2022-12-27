@@ -29,8 +29,6 @@ export default class MainRouter {
       )
     );
 
-    
-
     app.use("/raw", async (req, res, next: NextFunction) => {
       try {
         const result = await this.db.query(req.body.query, { raw: true });
