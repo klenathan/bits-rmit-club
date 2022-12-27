@@ -1,7 +1,7 @@
 {
-  "name": "sdkv-auth",
-  "version": "1.0.0",
-  "description": "A package for skdv login feature, built using typescript",
+  "name": "rmit-club-zone",
+  "version": "0.1.0",
+  "description": "RMIT Club Zone Project - Backend",
   "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
