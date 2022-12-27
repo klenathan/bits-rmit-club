@@ -75,8 +75,8 @@ export default class Server {
       if (route.middlewares)
         this.instance.use(
           route.prefix,
-          this.logMiddleware,
           route.middlewares,
+          this.logMiddleware,
           route.instance
         );
       else this.instance.use(route.prefix, this.logMiddleware, route.instance);

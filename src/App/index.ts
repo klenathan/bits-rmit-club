@@ -25,7 +25,7 @@ import ImgRouter from "../ImageProcess/Image.routes";
 // Notifications
 import { Notification } from "../Notification/Notification.model";
 import { UserNoti } from "../Notification/UserNoti.model";
-import { RequestHandler } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 
 const PORT = 8080;
 
@@ -46,7 +46,17 @@ const auth = new AuthPackage(db);
 const post = new PostPackage(db);
 const club = new ClubPackage(db);
 
+
+// Init Formdata parser
 const upload = multer();
+// formdata loggin 
+// const formDataLogger = (req: Request, res: Response, next: NextFunction) => {
+//   if (req.body) {
+//     console.log("RequestBody", req.body);
+//   }
+//   return next()
+// }
+
 
 const routerObj: Irouter = {
   routers: [
