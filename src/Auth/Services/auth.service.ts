@@ -191,8 +191,6 @@ export default class AuthService extends BaseService<User> {
   banUser = async (username: string, requesterUsername: string) => {
     let requester = await User.findByPk(requesterUsername)
       .then((r) => {
-        console.log(r, "isAdmin:", r?.isAdmin);
-        
         if (!r?.isAdmin) {
           throw new CustomError(
             "UNAUTHORIZED",
@@ -205,7 +203,7 @@ export default class AuthService extends BaseService<User> {
       .catch((e) => {
         throw new CustomError(e.name, 400, e.message);
       });
-
+    
     let user = await User.findByPk(username)
       .then((r) => {
         console.log(r?.status);
