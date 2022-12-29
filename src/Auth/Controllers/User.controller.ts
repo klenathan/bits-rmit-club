@@ -137,18 +137,18 @@ export default class AuthController {
     try {
       console.log(req.body);
       
-      if (!req.params.username || !req.body.requester) {
+      if (!req.params.username) {
         return next(
           new CustomError(
             "INVALID_INPUT",
             400,
             "Please include username and requester",
-            { user: req.params.username, requester: req.body.requester }
+            { user: req.params.username}
           )
         );
       }
       return await this.services
-        .removeUser(req.params.username, req.body.requester)
+        .removeUser(req.params.username)
         .then((r) => {
           return res.status(200).send(r);
         });
