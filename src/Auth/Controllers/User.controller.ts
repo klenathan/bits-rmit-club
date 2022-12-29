@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Sequelize } from "sequelize-typescript";
+import CustomError from "../../App/Middlewares/Errors/CustomError";
 import { User } from "../Models/User.model";
 import AuthService from "../Services/auth.service";
 
@@ -134,6 +135,9 @@ export default class AuthController {
 
   removeUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      if (!req.params.username || !req.body.requester) {
+        return next(new CustomError("INVALID_INPUT", 400, "Please include usernmae and requester"))
+      }
       return await this.services
         .removeUser(req.params.username, req.body.requester)
         .then((r) => {
