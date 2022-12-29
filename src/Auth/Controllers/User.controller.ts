@@ -90,16 +90,17 @@ export default class AuthController {
       let payload = req.body;
       let files = req.files as Express.Multer.File[];
       console.log(payload);
+
       if (req.files) {
         let newAva = await this.services.updateAvatar(files[0]);
         payload.avatar = newAva;
       }
 
       await this.services.updateUser(username, payload).then((result) => {
-        // return res.status(200).send({
-        //   message: `Successfully update user data | ${result} users updated`,
-        //   payload: payload
-        // });
+        return res.status(200).send({
+          message: `Successfully update user data | ${result} users updated`,
+          payload: payload
+        });
       });
       return await User.findByPk(username).then((r) => {
         return res.send(r);
@@ -112,7 +113,7 @@ export default class AuthController {
   banUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       return await this.services
-        .banUser(req.body.username, req.body.user)
+        .banUser(req.body.username, req.body.requester)
         .then((result) => {
           return res.send(result);
         });
@@ -124,7 +125,7 @@ export default class AuthController {
   unbanUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       return await this.services
-        .unbanUser(req.body.username, req.body.user)
+        .unbanUser(req.body.username, req.body.requester)
         .then((result) => {
           return res.send(result);
         });
