@@ -24,6 +24,7 @@ export default class PostService {
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
+
     if (!club)
       throw new CustomError("CLUB_NOT_FOUND", 404, `${clubId} cannot be found`);
     // console.log(club);
@@ -44,8 +45,14 @@ export default class PostService {
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
+    // console.log("input", username, clubId);
+    // console.log("club debug", club);
     if (!club)
-      throw new CustomError("CLUB_NOT_FOUND", 404, `${clubId} cannot be found`);
+      throw new CustomError(
+        "CLUBUSER_NOT_FOUND",
+        404,
+        `${username} cannot be found in club ${clubId}`
+      );
     // console.log(club);
 
     if (club.role != "president" && club.role != "contentWriter") {
@@ -133,13 +140,15 @@ export default class PostService {
   };
 
   updatePost = async (id: string, payload: Partial<Post>, username: string) => {
-    // console.log(id);
-    await this.contentAuthorizationCheck(username, id);
-    let post = await Post.findByPk(id).catch(e => {
-      throw new CustomError(e.name, 400, e.message)
+
+    let post = await Post.findByPk(id).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
     });
-    if (!post)
+
+    if (!post) {
       throw new NotFoundError("POST_NOT_FOUND", `${id} cannot be found`);
+    }
+    await this.contentAuthorizationCheck(username, post.author);
 
     post.update(payload);
     post.save();

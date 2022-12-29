@@ -92,11 +92,12 @@ export default class PostController {
           )
         );
       }
-
+      // console.log("here 1");
+      
       return await this.service
         .updatePost(id, req.body, req.body.username)
         .then((r) => {
-          return res.status(200).send({ result: `updated ${r} post` });
+          return res.status(200).send(r);
         });
     } catch (e) {
       return next(e);
