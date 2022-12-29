@@ -136,7 +136,14 @@ export default class AuthController {
   removeUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       if (!req.params.username || !req.body.requester) {
-        return next(new CustomError("INVALID_INPUT", 400, "Please include usernmae and requester"))
+        return next(
+          new CustomError(
+            "INVALID_INPUT",
+            400,
+            "Please include username and requester",
+            { user: req.params.username, requester: req.body.requester }
+          )
+        );
       }
       return await this.services
         .removeUser(req.params.username, req.body.requester)
