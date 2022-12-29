@@ -53,7 +53,7 @@ export default class AuthController {
       let files = req.files as Express.Multer.File[];
       let payload: Partial<User> = req.body;
       let regex = new RegExp("s[0-9]+@rmit.edu.vn");
-      
+
       if (payload.email) {
         if (!regex.test(payload.email)) {
           return res.status(400).send({
@@ -62,7 +62,7 @@ export default class AuthController {
           });
         }
       }
-      
+
       return await this.services.signUp(payload, files).then((result) => {
         res.status(200).send(result);
       });
@@ -87,24 +87,22 @@ export default class AuthController {
     try {
       const username = req.params.username;
       let payload = req.body;
-      let files = req.files as Express.Multer.File[]
+      let files = req.files as Express.Multer.File[];
       console.log(payload);
       if (req.files) {
-        let newAva = await this.services.updateAvatar(files[0])
+        let newAva = await this.services.updateAvatar(files[0]);
         payload.avatar = newAva;
       }
-      
-      
+
       await this.services.updateUser(username, payload).then((result) => {
-        
         // return res.status(200).send({
         //   message: `Successfully update user data | ${result} users updated`,
         //   payload: payload
         // });
       });
-      return await User.findByPk(username).then(r => {
-        return res.send(r)
-      })
+      return await User.findByPk(username).then((r) => {
+        return res.send(r);
+      });
     } catch (error) {
       return next(error);
     }
@@ -134,4 +132,15 @@ export default class AuthController {
     }
   };
 
+  removeUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      return await this.services
+        .removeUser(req.params.user, req.body.requester)
+        .then((r) => {
+          return res.status(200).send(r);
+        });
+    } catch (e) {
+      return next(e);
+    }
+  };
 }

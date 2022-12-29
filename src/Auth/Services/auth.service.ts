@@ -263,4 +263,32 @@ export default class AuthService extends BaseService<User> {
 
     return user;
   };
+
+  removeUser = async (username: string, requester: string) => {
+    await User.findByPk(requester)
+      .then((r) => {
+        if (!r?.isAdmin)
+          throw new CustomError(
+            "UNAUTHORIZED",
+            403,
+            `${requester} is not authorized for this task`
+          );
+      })
+      .catch((e) => {
+        throw new CustomError(e.name, 400, e.message);
+      });
+
+    let user = await User.findByPk(username).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+
+    if (!user) {
+      throw new NotFoundError(`USER_NOT_FOUND`, `${user} cannot be found`);
+    }
+
+    user.destroy();
+    user.save();
+
+    return { success: `deleted ${username}` };
+  };
 }

@@ -23,6 +23,7 @@ export default class AuthRouter {
       .post("/ban", this.controller.banUser)
       .post("/unban", this.controller.unbanUser)
       .put("/:username", this.controller.updateUser)
-      .get("/:id", this.controller.getUserInfo);
+      .get("/:id", this.controller.getUserInfo)
+      .delete("/:id", this.controller.removeUser);
   }
 }
