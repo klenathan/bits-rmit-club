@@ -267,6 +267,7 @@ export default class AuthService extends BaseService<User> {
   removeUser = async (username: string, requester: string) => {
     await User.findByPk(requester)
       .then((r) => {
+        if (!r) throw new NotFoundError("USER_NOT_FOUND", `requester ${requester} cannot be found`)
         if (!r?.isAdmin)
           throw new CustomError(
             "UNAUTHORIZED",
