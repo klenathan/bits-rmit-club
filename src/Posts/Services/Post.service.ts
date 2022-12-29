@@ -38,6 +38,26 @@ export default class PostService {
     return true;
   };
 
+  contentAuthorizationCheck = async (username: string, clubId: string) => {
+    let club = await ClubUser.findOne({
+      where: { cid: clubId, username: username },
+    }).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+    if (!club)
+      throw new CustomError("CLUB_NOT_FOUND", 404, `${clubId} cannot be found`);
+    // console.log(club);
+
+    if (club.role != "president" && club.role != "contentWriter") {
+      throw new CustomError(
+        "UNAUTHORIZED",
+        403,
+        `${username} is not authorized to take action on club id ${clubId}`
+      );
+    }
+    return true;
+  };
+
   create = async (payload: Partial<Post>) => {
     if (payload.content == null && payload.imgLink == null) {
       throw new CustomError(
@@ -112,11 +132,17 @@ export default class PostService {
     }
   };
 
-  updatePost = async (id: string, payload: Partial<Post>) => {
+  updatePost = async (id: string, payload: Partial<Post>, username: string) => {
     try {
-      console.log(id);
-      let result = await Post.update(payload, { where: { id: id } });
-      return result;
+      // console.log(id);
+      this.contentAuthorizationCheck(username, id)
+      let post = await Post.findByPk(id)
+      if (!post) throw new NotFoundError("POST_NOT_FOUND", `${id} cannot be found`)
+
+      post.update(payload)
+      post.save();
+
+      return post;
     } catch (e: any) {
       throw new CustomError(e.name, 400, e.message);
     }

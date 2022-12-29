@@ -81,10 +81,8 @@ export default class PostController {
 
   updatePost = async (req: Request, res: Response, next: NextFunction) => {
     try {
-
       let id = req.params.id;
-      
-      
+
       if (req.body.avatar) {
         return next(
           new CustomError(
@@ -94,11 +92,12 @@ export default class PostController {
           )
         );
       }
-      
-      return await this.service.updatePost(id, req.body).then(r => {
-        return res.status(200).send({result: `updated ${r} post`});
-      });
-      
+
+      return await this.service
+        .updatePost(id, req.body, req.body.username)
+        .then((r) => {
+          return res.status(200).send({ result: `updated ${r} post` });
+        });
     } catch (e) {
       return next(e);
     }
@@ -170,8 +169,7 @@ export default class PostController {
       );
     }
     let username = req.query.user as string;
-    
-    
+
     try {
       return await this.service.getAllEvent(username).then((r) => {
         return res.status(200).send(r);
