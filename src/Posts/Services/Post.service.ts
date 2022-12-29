@@ -133,19 +133,18 @@ export default class PostService {
   };
 
   updatePost = async (id: string, payload: Partial<Post>, username: string) => {
-    try {
-      // console.log(id);
-      this.contentAuthorizationCheck(username, id)
-      let post = await Post.findByPk(id)
-      if (!post) throw new NotFoundError("POST_NOT_FOUND", `${id} cannot be found`)
+    // console.log(id);
+    await this.contentAuthorizationCheck(username, id);
+    let post = await Post.findByPk(id).catch(e => {
+      throw new CustomError(e.name, 400, e.message)
+    });
+    if (!post)
+      throw new NotFoundError("POST_NOT_FOUND", `${id} cannot be found`);
 
-      post.update(payload)
-      post.save();
+    post.update(payload);
+    post.save();
 
-      return post;
-    } catch (e: any) {
-      throw new CustomError(e.name, 400, e.message);
-    }
+    return post;
   };
 
   // LikePost
