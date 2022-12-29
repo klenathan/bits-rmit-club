@@ -135,7 +135,7 @@ export default class AuthController {
   removeUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
       return await this.services
-        .removeUser(req.params.user, req.body.requester)
+        .removeUser(req.params.username, req.body.requester)
         .then((r) => {
           return res.status(200).send(r);
         });

@@ -283,7 +283,7 @@ export default class AuthService extends BaseService<User> {
     });
 
     if (!user) {
-      throw new NotFoundError(`USER_NOT_FOUND`, `${user} cannot be found`);
+      throw new NotFoundError(`USER_NOT_FOUND`, `${username} cannot be found`);
     }
 
     user.destroy();
