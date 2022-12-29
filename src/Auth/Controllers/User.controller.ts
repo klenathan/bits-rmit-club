@@ -135,6 +135,8 @@ export default class AuthController {
 
   removeUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      console.log(req.body);
+      
       if (!req.params.username || !req.body.requester) {
         return next(
           new CustomError(
