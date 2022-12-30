@@ -314,28 +314,35 @@ export default class ClubService {
     username: string,
     clubId: string
   ) => {
+    
     let currentPresident = await ClubUser.findOne({
       where: { role: "president", cid: clubId },
     })
       .then(async (result) => {
         // Check if user is Club's president
-        if (!(result?.username == requester)) {
-          // Check if user is APP Admin
-          await User.findByPk(requester).then((requesterInfo) => {
-            if (!requesterInfo?.isAdmin) {
-              throw new CustomError(
-                "UNAUTHORIZED",
-                403,
-                "You do not have permission for this action"
-              );
-            }
-          });
-        } else if (result?.username == username) {
+        // console.log(result?.username, username, result?.username == username);
+        
+        // if (!(result?.username == requester)) {
+        //   // Check if user is APP Admin
+        //   await User.findByPk(requester).then((requesterInfo) => {
+        //     if (!requesterInfo?.isAdmin) {
+        //       throw new CustomError(
+        //         "UNAUTHORIZED",
+        //         403,
+        //         "You do not have permission for this action"
+        //       );
+        //     }
+        //   });
+        // } else 
+        if (result?.username == username) {
+          console.log('here');
+          
           throw new CustomError(
             "USER_IS_PRESIDENT",
             400,
             `${username} is already the president`
           );
+          return;
         } else {
           console.log("update");
         }
@@ -357,6 +364,7 @@ export default class ClubService {
         );
     });
 
+    
     // Get current candidate information
     let clubUser = await ClubUser.findOne({
       where: { username: username, cid: clubId },
@@ -367,6 +375,7 @@ export default class ClubService {
           "USER_NOT_FOUND",
           `${username} is not found in club ${clubId}`
         );
+        
       if (result.role == "president")
         throw new CustomError(
           "USER_IS_PRESIDENT",
@@ -375,10 +384,13 @@ export default class ClubService {
         );
       else {
         result.update({ role: "president" });
+        result.save()
         return result;
       }
     });
+
     let curr = currentPresident?.username ?? "none";
+
     await Club.findByPk(clubId).then(async (r) => {
       r?.update({ president: clubUser.username });
 
