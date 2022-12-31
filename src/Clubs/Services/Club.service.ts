@@ -205,6 +205,21 @@ export default class ClubService {
     });
   };
 
+  getRequestClub = async (clubId: string) => {
+    let club = await Club.findByPk(clubId).then((r) => {
+      if (!r) {
+        throw new NotFoundError("CLUB_NOT_FOUND", `${clubId} cannot be found`);
+      }
+    });
+    let result = await ClubUser.findAll({
+      where: { cid: clubId, status: "pending" },
+    }).catch((e) => {
+      throw new CustomError(e.name, 400, e.message);
+    });
+
+    return result;
+  };
+
   removeMember = async (id: string, userArr: string[]) => {
     let clubUserQuery = await ClubUser.findAll({
       where: { username: { [Op.in]: userArr }, cid: id },
@@ -314,14 +329,13 @@ export default class ClubService {
     username: string,
     clubId: string
   ) => {
-    
     let currentPresident = await ClubUser.findOne({
       where: { role: "president", cid: clubId },
     })
       .then(async (result) => {
         // Check if user is Club's president
         // console.log(result?.username, username, result?.username == username);
-        
+
         // if (!(result?.username == requester)) {
         //   // Check if user is APP Admin
         //   await User.findByPk(requester).then((requesterInfo) => {
@@ -333,10 +347,10 @@ export default class ClubService {
         //       );
         //     }
         //   });
-        // } else 
+        // } else
         if (result?.username == username) {
-          console.log('here');
-          
+          console.log("here");
+
           throw new CustomError(
             "USER_IS_PRESIDENT",
             400,
@@ -364,7 +378,6 @@ export default class ClubService {
         );
     });
 
-    
     // Get current candidate information
     let clubUser = await ClubUser.findOne({
       where: { username: username, cid: clubId },
@@ -375,7 +388,7 @@ export default class ClubService {
           "USER_NOT_FOUND",
           `${username} is not found in club ${clubId}`
         );
-        
+
       if (result.role == "president")
         throw new CustomError(
           "USER_IS_PRESIDENT",
@@ -384,7 +397,7 @@ export default class ClubService {
         );
       else {
         result.update({ role: "president" });
-        result.save()
+        result.save();
         return result;
       }
     });
@@ -525,7 +538,7 @@ export default class ClubService {
 
     club.update({ status: "active" });
     club.save();
-    return club
+    return club;
   };
 
   rejectNewClub = async (requester: string, clubID: string) => {
@@ -560,6 +573,76 @@ export default class ClubService {
 
     club.destroy();
     club.save();
-    return {success: `Rejected club ${clubID}`}
+    return { success: `Rejected club ${clubID}` };
+  };
+
+  acceptNewMember = async (
+    requester: string,
+    clubid: string,
+    member: string
+  ) => {
+    /// auth check
+    let clubPresident = await Club.findByPk(clubid).then((r) => {
+      if (!r) {
+        throw new NotFoundError("CLUB_NOT_FOUND", `${clubid} cannot be found`);
+      }
+      if (r.president != requester) {
+        throw new CustomError(
+          "UNAUTHORIZED",
+          403,
+          `${requester} is not authorized for this task in club ${clubid}`
+        );
+      }
+    });
+    let clubMember = await ClubUser.findOne({
+      where: { cid: clubid, username: member },
+    }).then((r) => {
+      if (!r) {
+        throw new NotFoundError(
+          `MEMBER_NOT_FOUND`,
+          `${member} cannot be found in club ${clubid}`
+        );
+      }
+      return r;
+    });
+
+    clubMember.update({ status: "active" });
+    clubMember.save();
+    return clubMember;
+  };
+
+  rejectNewMember = async (
+    requester: string,
+    clubid: string,
+    member: string
+  ) => {
+    /// auth check
+    let clubPresident = await Club.findByPk(clubid).then((r) => {
+      if (!r) {
+        throw new NotFoundError("CLUB_NOT_FOUND", `${clubid} cannot be found`);
+      }
+      if (r.president != requester) {
+        throw new CustomError(
+          "UNAUTHORIZED",
+          403,
+          `${requester} is not authorized for this task in club ${clubid}`
+        );
+      }
+    });
+    let clubMember = await ClubUser.findOne({
+      where: { cid: clubid, username: member },
+    }).then((r) => {
+      if (!r) {
+        throw new NotFoundError(
+          `MEMBER_NOT_FOUND`,
+          `${member} cannot be found in club ${clubid}`
+        );
+      }
+      return r;
+    });
+
+    clubMember.destroy();
+    clubMember.save();
+    return { success: `Rejected ${member} in club ${clubid}` };
   };
 }

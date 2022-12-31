@@ -97,6 +97,18 @@ export default class ClubController {
     }
   };
 
+  getRequestClub = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // const username = req.query.username ?? req.query.user;
+      const clubId = req.params.id;
+      return await this.service.getRequestClub(clubId).then((r) => {
+        return res.status(200).send(r);
+      });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
   addNewMember = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const clubID = req.body.clubId;
@@ -258,6 +270,32 @@ export default class ClubController {
         .then((result) => {
           return res.status(200).send(result);
         });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  acceptNewMember = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let requester = req.body.user;
+      let member = req.body.member
+      let clubid = req.body.clubID;
+      return await this.service.acceptNewMember(requester, clubid, member).then((r) => {
+        return res.status(200).send(r);
+      });
+    } catch (e) {
+      return next(e);
+    }
+  };
+
+  rejectNewMember = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      let requester = req.body.user;
+      let member = req.body.member
+      let clubid = req.body.clubID;
+      return await this.service.rejectNewMember(requester, clubid, member).then((r) => {
+        return res.status(200).send(r);
+      });
     } catch (e) {
       return next(e);
     }
