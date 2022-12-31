@@ -90,7 +90,7 @@ export default class ClubService {
   };
 
   editClubInfo = async (clubId: string, payload: Partial<Club>) => {
-    await Club.findByPk(clubId)
+    let club = await Club.findByPk(clubId)
       .then((r) => {
         if (!r) {
           throw new NotFoundError(
@@ -111,12 +111,14 @@ export default class ClubService {
       .catch((e) => {
         throw new CustomError(e.name, 400, e.message);
       });
-
-    return await Club.update(payload, {
-      where: { clubid: clubId },
-    }).catch((e) => {
-      throw new CustomError(e.name, 400, e.message);
-    });
+    club.update(payload);
+    club.save();
+    return club;
+    // return await Club.update(payload, {
+    //   where: { clubid: clubId },
+    // }).catch((e) => {
+    //   throw new CustomError(e.name, 400, e.message);
+    // });
   };
 
   changeBackground = async (

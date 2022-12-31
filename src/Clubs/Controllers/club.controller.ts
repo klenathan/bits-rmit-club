@@ -37,9 +37,7 @@ export default class ClubController {
       return await this.service
         .editClubInfo(clubId, req.body)
         .then((result) => {
-          return res.send({
-            message: ` Edited ${result} clubs info: ${clubId}`,
-          });
+          return res.send(result);
         });
     } catch (e) {
       return next(e);
@@ -277,7 +275,7 @@ export default class ClubController {
 
   acceptNewMember = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      let requester = req.body.user;
+      let requester = req.body.requester;
       let member = req.body.member
       let clubid = req.body.clubID;
       return await this.service.acceptNewMember(requester, clubid, member).then((r) => {
@@ -290,7 +288,7 @@ export default class ClubController {
 
   rejectNewMember = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      let requester = req.body.user;
+      let requester = req.body.requester;
       let member = req.body.member
       let clubid = req.body.clubID;
       return await this.service.rejectNewMember(requester, clubid, member).then((r) => {
