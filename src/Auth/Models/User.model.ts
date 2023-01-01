@@ -66,4 +66,5 @@ export class User extends Model {
 
   @BelongsToMany(() => Notification, () => UserNoti)
   has!: Notification[];
+  ClubUser: any;
 }

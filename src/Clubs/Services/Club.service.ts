@@ -208,19 +208,17 @@ export default class ClubService {
   };
 
   getRequestClub = async (clubId: string) => {
-    let club = await Club.findByPk(clubId).then((r) => {
-      if (!r) {
-        throw new NotFoundError("CLUB_NOT_FOUND", `${clubId} cannot be found`);
-      }
-    });
-    let result = await ClubUser.findAll({
-      where: { cid: clubId, status: "pending" },
-    }).catch((e) => {
-      throw new CustomError(e.name, 400, e.message);
-    });
 
-    return result;
-  };
+    let club = await Club.findByPk(clubId, {include: {
+      model: User,
+      attributes: {exclude: ["password"]},
+      through:{where: {status: 'pending'}}
+    }})
+
+    if (!club) throw new NotFoundError("CLUB_NOT_FOUND", `${clubId} cannot be found`)
+
+    return club.member;
+    }
 
   removeMember = async (id: string, userArr: string[]) => {
     let clubUserQuery = await ClubUser.findAll({
@@ -490,7 +488,7 @@ export default class ClubService {
   };
 
   getAllClubRequest = async () => {
-    let result = await Club.findAll({ where: { status: "pending" } });
+    let result = await Club.findAll({ where: { status: "pending" }});
     return result;
   };
 
