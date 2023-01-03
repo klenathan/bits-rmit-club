@@ -142,6 +142,7 @@ export default class ClubController {
       const clubID = req.body.clubId;
       const user = req.body.user;
       const role: string = req.body.role;
+      // const role: string = req.body.role;
       return await this.service.editUserRole(clubID, user, role).then((r) => {
         return res.status(200).send(r);
       });

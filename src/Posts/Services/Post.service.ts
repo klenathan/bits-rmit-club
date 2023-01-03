@@ -25,10 +25,13 @@ export default class PostService {
       throw new CustomError(e.name, 400, e.message);
     });
 
-    if (!club)
-      throw new CustomError("CLUB_NOT_FOUND", 404, `${clubId} cannot be found`);
-    // console.log(club);
+    console.log(club?.cid);
+    
 
+    if (!club)
+      throw new CustomError("CLUBUSER_NOT_FOUND", 404, `${clubId} cannot be found`);
+    
+    
     if (club.role != "president") {
       throw new CustomError(
         "UNAUTHORIZED",
@@ -244,6 +247,7 @@ export default class PostService {
         Club,
         {
           model: PostComment,
+          order: ['createdAt', 'DESC'],
           include: [
             {
               model: User,
@@ -273,6 +277,7 @@ export default class PostService {
         Club,
         {
           model: PostComment,
+          order: ['createdAt', 'DESC'],
           include: [
             {
               model: User,
@@ -300,6 +305,7 @@ export default class PostService {
         Club,
         {
           model: PostComment,
+          order: ['createdAt', 'DESC'],
           include: [
             {
               model: User,
@@ -357,6 +363,7 @@ export default class PostService {
         Club,
         {
           model: PostComment,
+          order: ['createdAt', 'DESC'],
           include: [
             {
               model: User,
