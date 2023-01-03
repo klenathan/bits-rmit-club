@@ -223,20 +223,18 @@ export default class ClubService {
   };
 
   removeMember = async (id: string, user: string) => {
-    let clubUserQuery = await ClubUser.findAll({
+    let clubUserQuery = await ClubUser.findOne({
       where: { username: user, cid: id },
     });
-
-    if (clubUserQuery.length != user.length) {
-      throw new NotFoundError("USER_NOT_FOUND", "Some user cannot be found");
+    if (!clubUserQuery) {
+      throw new NotFoundError(
+        "USER_NOT_FOUND",
+        `${user} cannot be found in club ${id}`
+      );
     }
-
-    let deleteResult = await ClubUser.destroy({
-      where: { username: user, cid: id },
-    }).catch((e) => {
-      throw new CustomError(e.name, 400, e.message);
-    });
-    return deleteResult;
+    clubUserQuery.destroy();
+    clubUserQuery.save();
+    return clubUserQuery;
   };
 
   editUserRole = async (id: string, user: string, role: string) => {
