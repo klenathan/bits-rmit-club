@@ -208,29 +208,31 @@ export default class ClubService {
   };
 
   getRequestClub = async (clubId: string) => {
-
-    let club = await Club.findByPk(clubId, {include: {
-      model: User,
-      attributes: {exclude: ["password"]},
-      through:{where: {status: 'pending'}}
-    }})
-
-    if (!club) throw new NotFoundError("CLUB_NOT_FOUND", `${clubId} cannot be found`)
-
-    return club.member;
-    }
-
-  removeMember = async (id: string, userArr: string[]) => {
-    let clubUserQuery = await ClubUser.findAll({
-      where: { username: { [Op.in]: userArr }, cid: id },
+    let club = await Club.findByPk(clubId, {
+      include: {
+        model: User,
+        attributes: { exclude: ["password"] },
+        through: { where: { status: "pending" } },
+      },
     });
 
-    if (clubUserQuery.length != userArr.length) {
+    if (!club)
+      throw new NotFoundError("CLUB_NOT_FOUND", `${clubId} cannot be found`);
+
+    return club.member;
+  };
+
+  removeMember = async (id: string, user: string) => {
+    let clubUserQuery = await ClubUser.findAll({
+      where: { username: user, cid: id },
+    });
+
+    if (clubUserQuery.length != user.length) {
       throw new NotFoundError("USER_NOT_FOUND", "Some user cannot be found");
     }
 
     let deleteResult = await ClubUser.destroy({
-      where: { username: { [Op.in]: userArr }, cid: id },
+      where: { username: user, cid: id },
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
@@ -488,7 +490,7 @@ export default class ClubService {
   };
 
   getAllClubRequest = async () => {
-    let result = await Club.findAll({ where: { status: "pending" }});
+    let result = await Club.findAll({ where: { status: "pending" } });
     return result;
   };
 
