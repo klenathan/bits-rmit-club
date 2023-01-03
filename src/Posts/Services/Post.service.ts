@@ -247,7 +247,6 @@ export default class PostService {
         Club,
         {
           model: PostComment,
-          order: ['createdAt', 'ASC'],
           include: [
             {
               model: User,
@@ -263,7 +262,7 @@ export default class PostService {
           },
         },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [["createdAt", "DESC"], [{model: PostComment, as: 'comments'}, 'createdAt', 'DESC']],
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
@@ -277,7 +276,6 @@ export default class PostService {
         Club,
         {
           model: PostComment,
-          order: ['createdAt', 'ASC'],
           include: [
             {
               model: User,
@@ -293,7 +291,7 @@ export default class PostService {
           },
         },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [["createdAt", "DESC"], [{model: PostComment, as: 'comments'}, 'createdAt', 'DESC']],
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
@@ -305,7 +303,6 @@ export default class PostService {
         Club,
         {
           model: PostComment,
-          order: ['createdAt', 'ASC'],
           include: [
             {
               model: User,
@@ -321,6 +318,7 @@ export default class PostService {
           },
         },
       ],
+      order: [[{model: PostComment, as: 'comments'}, 'createdAt', 'DESC']]
     })
       .then((result) => {
         if (result == null) {
@@ -379,7 +377,7 @@ export default class PostService {
           },
         },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [["createdAt", "DESC"], [{model: PostComment, as: 'comments'}, 'createdAt', 'DESC']],
     }).catch((e) => {
       throw new CustomError(e.name, 400, e.message);
     });
