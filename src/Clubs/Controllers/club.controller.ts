@@ -124,10 +124,18 @@ export default class ClubController {
   removeMember = async (req: Request, res: Response, next: NextFunction) => {
     console.log(req.body);
     try {
-      const clubID = req.body.clubId;
-      const userArr = req.body.users;
+      if (!(req.query.clubId && req.query.user))
+        return next(
+          new CustomError(
+            "INVALID_INPUT",
+            400,
+            "Please include clubId and user in params"
+          )
+        );
+      const clubID = req.query.clubId as string;
+      const user = req.query.user as string;
 
-      return await this.service.removeMember(clubID, userArr).then((result) => {
+      return await this.service.removeMember(clubID, user).then((result) => {
         return res
           .status(200)
           .send({ message: `Deleted ${result} members from club ${clubID}` });
@@ -224,7 +232,7 @@ export default class ClubController {
     try {
       let requester = req.body.user;
       let clubID = req.body.clubID;
-      return await  this.service.rejectNewClub(requester, clubID).then((r) => {
+      return await this.service.rejectNewClub(requester, clubID).then((r) => {
         return res.status(200).send(r);
       });
     } catch (e) {
@@ -277,11 +285,13 @@ export default class ClubController {
   acceptNewMember = async (req: Request, res: Response, next: NextFunction) => {
     try {
       let requester = req.body.requester;
-      let member = req.body.member
+      let member = req.body.member;
       let clubid = req.body.clubID;
-      return await this.service.acceptNewMember(requester, clubid, member).then((r) => {
-        return res.status(200).send(r);
-      });
+      return await this.service
+        .acceptNewMember(requester, clubid, member)
+        .then((r) => {
+          return res.status(200).send(r);
+        });
     } catch (e) {
       return next(e);
     }
@@ -290,11 +300,13 @@ export default class ClubController {
   rejectNewMember = async (req: Request, res: Response, next: NextFunction) => {
     try {
       let requester = req.body.requester;
-      let member = req.body.member
+      let member = req.body.member;
       let clubid = req.body.clubID;
-      return await this.service.rejectNewMember(requester, clubid, member).then((r) => {
-        return res.status(200).send(r);
-      });
+      return await this.service
+        .rejectNewMember(requester, clubid, member)
+        .then((r) => {
+          return res.status(200).send(r);
+        });
     } catch (e) {
       return next(e);
     }
