@@ -247,7 +247,7 @@ export default class PostService {
         Club,
         {
           model: PostComment,
-          order: ['createdAt', 'DESC'],
+          order: ['createdAt', 'ASC'],
           include: [
             {
               model: User,
@@ -277,7 +277,7 @@ export default class PostService {
         Club,
         {
           model: PostComment,
-          order: ['createdAt', 'DESC'],
+          order: ['createdAt', 'ASC'],
           include: [
             {
               model: User,
@@ -305,7 +305,7 @@ export default class PostService {
         Club,
         {
           model: PostComment,
-          order: ['createdAt', 'DESC'],
+          order: ['createdAt', 'ASC'],
           include: [
             {
               model: User,
@@ -363,7 +363,7 @@ export default class PostService {
         Club,
         {
           model: PostComment,
-          order: ['createdAt', 'DESC'],
+          order: ['createdAt', 'ASC'],
           include: [
             {
               model: User,
